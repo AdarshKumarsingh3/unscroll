@@ -18,18 +18,19 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x android-app/gradlew || true
-
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v3
 
     - name: Build Debug APK
-      working-directory: ./android-app
-      run: gradle assembleDebug
+      run: |
+        if [ -d "android-app" ]; then
+          cd android-app
+        fi
+        chmod +x gradlew || true
+        gradle assembleDebug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: unscroll-debug-apk
-        path: android-app/app/build/outputs/apk/debug/*.apk
+        path: "**/build/outputs/apk/debug/*.apk"
