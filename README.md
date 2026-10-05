@@ -1,75 +1,51 @@
-# 🌊 UNSCROLL — The Anti-Doomscroll Habit OS (Founder MVP)
+# 📱 Unscroll — Native Android App (Kotlin & Jetpack Compose)
 
-> **"Friction + Replacement + Community — Reclaim your mind from the algorithms."**
-> 
-> *A production-grade MVP developed directly from the 90-Day Build Plan & Business Proposal.*
+This is the production-ready **Native Android Mobile Application** for the **Anti-Doomscroll Platform**, built strictly following the 90-Day Build Plan & Business Proposal.
 
 ---
 
-## 🚀 Live Demo & Quickstart
+## 🏗️ Architecture & Android Tech Stack
 
-### 1. Launch the Web Application
-```bash
-npm install
-npm run dev
-```
-Open **[http://localhost:5173](http://localhost:5173)** in your browser.
-
-### 2. Load the Chrome Extension (Manifest V3) in 15 Seconds:
-1. Open Google Chrome and navigate to `chrome://extensions/`.
-2. Toggle on **"Developer mode"** in the top-right corner.
-3. Click **"Load unpacked"** in the top-left corner.
-4. Select the `extension/` folder located in this repository.
-5. The **Unscroll Shield** will now actively intercept distracting feeds (Instagram Reels, TikTok, YouTube Shorts, X/Twitter, and Reddit).
+- **Language**: Kotlin 2.1.0
+- **UI Framework**: Modern Jetpack Compose & Material 3 (Dark calm mindfulness theme)
+- **Navigation**: Jetpack Navigation Compose
+- **Notifications**: Android `NotificationManager` with 3 dedicated channels:
+  1. `channel_mindfulness`: Gentle morning and evening reflection nudges.
+  2. `channel_focus`: Ongoing sticky notification in notification shade during active 25m Pomodoro sessions.
+  3. `channel_streak`: Celebrations when reclaiming hours from feeds.
+- **Feed Interception**: Native Android `AccessibilityService` (`DoomscrollInterceptorService`) that intercepts Instagram Reels, TikTok, YouTube Shorts, X/Twitter, and Reddit with a 5-second mindfulness pause.
+- **Haptic Tactile Engine**: Real phone vibration feedback via Android `Vibrator` / `VibrationEffect` during the 90-second Urge Surfer tap pacer.
+- **Audio Synthesis**: Pure Kotlin `AudioTrack` procedural synthesizer for 432Hz/528Hz harmonic singing bowl chimes and rain soundscapes (zero external audio file dependencies).
+- **Quick Settings Tile**: `QuickFocusTileService` allowing users to toggle Unscroll focus mode directly from Android's top status bar shade.
 
 ---
 
-## 🧠 The Problem & Why This Wins
+## 🚀 How to Run in Android Studio
 
-Short-form video feeds (Reels, Shorts, TikTok) are engineered by thousands of engineers to hijack dopamine reward loops. 
-
-- **Why pure blockers fail**: When users hit an empty blocked screen, the dopamine craving remains unsatisfied, provoking instant uninstalls or password bypasses.
-- **The Unscroll Formula**:
-  1. **Friction**: A calm 5-second mindfulness pause breaks the subconscious habit loop.
-  2. **Replacement**: Immediate delivery of satisfying 30 to 90-second dopamine alternatives matched to the underlying emotion (boredom, stress, fatigue, loneliness).
-  3. **Community**: Shared Live Focus Rooms, public Saved-Hours Walls, and friend streaks create positive social accountability.
+1. Open **Android Studio**.
+2. Select **Open** (or File $\rightarrow$ Open).
+3. Choose the folder: `c:\Users\adars\Downloads\New folder\android-app`
+4. Android Studio will automatically sync the Gradle files using the provided Version Catalog (`gradle/libs.versions.toml`).
+5. Connect your Android phone via USB (or start an Android Emulator) and click the green **Run (▶)** button!
 
 ---
 
-## ✨ Features Implemented in this MVP
+## 📋 Features Implemented (Matching the Proposal PDF)
 
-| Feature | Description | Business & User Impact |
+| Feature | Android Implementation | Impact |
 | :--- | :--- | :--- |
-| **Viral Screen-Time Cost Calculator** | Interactive slider calculates full 24-hr days lost per year, books missed, and workouts stolen. Generates a branded shareable result card. | **Top-of-funnel acquisition driver** (30%+ organic share rate). |
-| **Reality-Check Interceptor** | In-app browser simulator + real Manifest V3 Chrome Extension. Catches `instagram.com/reels`, `tiktok.com`, `youtube.com/shorts`, `x.com`, etc. | **Daily active retention driver**. Breaks unconscious automatic opens. |
-| **90-Second Urge Surfer** | Guided breathing (Box Breathing, Physiological Sigh, 4-7-8) + tactile tap pacer based on Dr. Alan Marlatt's craving wave protocol. | **Emotional trust**. Craving intensity drops by >70% in 90 seconds. |
-| **Micro-Replacement Bites** | Playable interactive activities: Reflex Sprint game, Daily Neuroscience Trivia, 10-Rep Squat counter, Text-a-Friend spark, and Mental Model bites. | **Replaces feed dopamine** without cognitive depletion. |
-| **Live Focus Rooms** | Synchronized 25/5 Pomodoro timer with zero-dependency Web Audio ambient rain synthesizer, live global counter (318 focusers), and intention wall. | **Community moat & premium upsell** (private team/cohort rooms). |
-| **Streaks & Saved-Hours Wall** | Personal dashboard tracking hours saved, active streak shields, and 5-stage dopamine rewiring milestones. | **Habit loop retention**; reduces churn. |
-| **Monetization Engine** | Interactive Free vs. Premium comparison matrix ($4.99/mo or $29.99/yr), 7-day trial, and B2B campus seat licensing ($12/seat/year). | **Clear path to $180k - $600k Year 1 ARR**. |
-| **Founder & Investor Hub** | Dedicated portal displaying the 90-Day Week-by-Week Plan, Phase Gates, Financial Projections, and Decisions Needed from the Founder. | **Executive alignment and investor pitch readiness**. |
+| **1. Screen-Time Cost Calculator** | `CalculatorScreen.kt` with live interactive sliders and native Android `Intent.ACTION_SEND` share chooser. | Viral top-of-funnel acquisition. |
+| **2. Reality-Check Interceptor** | `DoomscrollInterceptorService.kt` + `InterceptorScreen.kt` with Accessibility service integration and 5s pause simulation. | Breaks unconscious automatic app opening loops. |
+| **3. 90-Second Urge Surfer** | `UrgeSurferScreen.kt` with animated breathing scale, tactile phone vibration, singing bowl chimes, and craving rating gauge. | Clinically dissolves craving peaks within 90s. |
+| **4. Micro-Replacement Bites** | `ReplacementsScreen.kt` covering all 6 triggers (Bored, Stressed, Restless, Lonely, Productive, Learn) with mini-games, trivia, squat counter, and SMS launcher. | Dopamine substitution without endless scrolling. |
+| **5. Live Focus Rooms** | `FocusRoomsScreen.kt` with 25/5 Pomodoro timer, background ongoing notification, and live peer presence. | Social accountability and focus community. |
+| **6. Saved-Hours Wall** | `DashboardScreen.kt` tracking hours reclaimed, active flame streak, and dopamine rewiring milestones. | Habit loop retention. |
+| **7. Founder & Investor Deck** | `FounderDeckScreen.kt` with the 90-day phase gates, Year 1 revenue scenarios, and action items. | Executive pitch ready. |
 
 ---
 
-## 🛠️ Architecture & Tech Stack
-
-- **Frontend**: React 19, TypeScript, Vite, Tailwind CSS v4, Lucide Icons, Canvas Confetti.
-- **Audio Synthesizer**: Custom Web Audio API synthesizer for procedural ambient rain, brown noise, and harmonic Tibetan singing bowl chimes (zero external audio asset dependencies).
-- **Extension**: Chrome Extension Manifest V3 (`content.js`, `interceptor.css`, `popup.html`, `popup.js`).
-- **Responsive**: Mobile-first viewport optimized for smartphones and desktop browsers.
-
----
-
-## 📊 Year 1 Financial Scenarios (from Proposal)
-
-- **Conservative**: 50,000 users • 3% conversion • 1,500 subscribers = **$45,000 + $30,000 B2B = $75,000**
-- **Base Case**: 150,000 users • 4% conversion • 6,000 subscribers = **$180,000 + $60,000 B2B = $240,000**
-- **Optimistic**: 400,000 users • 5% conversion • 20,000 subscribers = **$600,000 + $120,000 B2B = $720,000**
-
----
-
-## 🎯 Next Steps for the Founder (Section 13)
-1. **Brand Name**: Confirm brand identity (*UNSCROLL*).
-2. **Budget & Commitment**: Finalize team allocations for the 90-day execution window.
-3. **Institutional Outreach**: Authorize outreach to 2–3 pilot university student unions or developer bootcamps.
-4. **Phase 1 Gate**: Achieve 500+ waitlist/calculator completions before entering Phase 2.
+## 🔒 Permissions Used
+- `POST_NOTIFICATIONS`: Android 13+ runtime notification display.
+- `VIBRATE`: Physical tactile feedback for Urge Surfer.
+- `BIND_ACCESSIBILITY_SERVICE`: Automatic detection of social feed opens.
+- `SYSTEM_ALERT_WINDOW`: Displaying the mindfulness pause screen over distracting apps.
