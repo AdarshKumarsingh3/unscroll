@@ -18,15 +18,29 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Setup Gradle
+    - name: Setup Gradle 8.11
       uses: gradle/actions/setup-gradle@v3
+      with:
+        gradle-version: '8.11.1'
 
-    - name: Build Debug APK
+    - name: Locate Android Project & Build APK
       run: |
-        if [ -d "android-app" ]; then
-          cd android-app
+        # Automatically find the directory containing settings.gradle or settings.gradle.kts
+        PROJECT_DIR=$(find . -name "settings.gradle*" -exec dirname {} \; | head -n 1)
+
+        if [ -z "$PROJECT_DIR" ]; then
+          PROJECT_DIR=$(find . -name "build.gradle*" -exec dirname {} \; | head -n 1)
         fi
-        chmod +x gradlew || true
+
+        if [ -z "$PROJECT_DIR" ]; then
+          echo "ERROR: Neither settings.gradle nor build.gradle was found in this repo."
+          echo "Files in repository are:"
+          find . -maxdepth 3 -not -path '*/.*'
+          exit 1
+        fi
+
+        echo "Found Android project at: $PROJECT_DIR"
+        cd "$PROJECT_DIR"
         gradle assembleDebug
 
     - name: Upload APK
