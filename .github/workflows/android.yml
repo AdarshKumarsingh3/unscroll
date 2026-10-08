@@ -25,23 +25,19 @@ jobs:
 
     - name: Locate Android Project & Build APK
       run: |
-        # Automatically find the directory containing settings.gradle or settings.gradle.kts
-        PROJECT_DIR=$(find . -name "settings.gradle*" -exec dirname {} \; | head -n 1)
-
-        if [ -z "$PROJECT_DIR" ]; then
-          PROJECT_DIR=$(find . -name "build.gradle*" -exec dirname {} \; | head -n 1)
-        fi
-
-        if [ -z "$PROJECT_DIR" ]; then
-          echo "ERROR: Neither settings.gradle nor build.gradle was found in this repo."
-          echo "Files in repository are:"
-          find . -maxdepth 3 -not -path '*/.*'
-          exit 1
+        if [ -f "settings.gradle.kts" ] || [ -f "settings.gradle" ]; then
+          PROJECT_DIR="."
+        elif [ -d "android apk" ]; then
+          PROJECT_DIR="android apk"
+        elif [ -d "android-app" ]; then
+          PROJECT_DIR="android-app"
+        else
+          PROJECT_DIR="."
         fi
 
         echo "Found Android project at: $PROJECT_DIR"
         cd "$PROJECT_DIR"
-        gradle assembleDebug
+        gradle assembleDebug --stacktrace
 
     - name: Upload APK
       uses: actions/upload-artifact@v4

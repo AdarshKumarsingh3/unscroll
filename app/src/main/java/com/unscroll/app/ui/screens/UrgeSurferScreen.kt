@@ -251,7 +251,7 @@ fun UrgeSurferScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Icon(
-                            Icons.Default.CheckCircle,
+                            Icons.Default.Check,
                             contentDescription = null,
                             tint = EmeraldAccent,
                             modifier = Modifier.size(64.dp)
