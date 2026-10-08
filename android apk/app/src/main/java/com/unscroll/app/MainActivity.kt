@@ -21,7 +21,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.unscroll.app.service.FocusNotificationManager
 import com.unscroll.app.ui.navigation.Screen
 import com.unscroll.app.ui.screens.*
 import com.unscroll.app.ui.theme.*
@@ -30,21 +29,12 @@ class MainActivity : ComponentActivity() {
 
     private val requestNotificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            FocusNotificationManager.showMindfulnessNudge(
-                this,
-                "Unscroll Notifications Active",
-                "You will receive mindful nudges and focus session status."
-            )
-        }
+    ) { _ ->
+        // Handled safely without popping immediate notification crashes
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Request notification permission on Android 13+
-        checkAndRequestNotificationPermission()
 
         val navTarget = intent.getStringExtra("EXTRA_NAV_TARGET") ?: Screen.Calculator.route
 
@@ -54,12 +44,29 @@ class MainActivity : ComponentActivity() {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route ?: Screen.Calculator.route
 
-                // Navigate if triggered by interceptor service
+                // Request notification permission smoothly after the UI is rendered
+                LaunchedEffect(Unit) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        try {
+                            val hasPermission = ContextCompat.checkSelfPermission(
+                                this@MainActivity,
+                                Manifest.permission.POST_NOTIFICATIONS
+                            ) == PackageManager.PERMISSION_GRANTED
+                            if (!hasPermission) {
+                                requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            }
+                        } catch (_: Exception) {}
+                    }
+                }
+
+                // Deep-link navigation if triggered by interceptor service
                 LaunchedEffect(navTarget) {
                     if (navTarget == "interceptor") {
-                        navController.navigate(Screen.Interceptor.route) {
-                            popUpTo(Screen.Calculator.route)
-                        }
+                        try {
+                            navController.navigate(Screen.Interceptor.route) {
+                                popUpTo(Screen.Calculator.route)
+                            }
+                        } catch (_: Exception) {}
                     }
                 }
 
@@ -91,12 +98,16 @@ class MainActivity : ComponentActivity() {
                                     selected = isSelected,
                                     onClick = {
                                         if (currentRoute != screen.route) {
-                                            navController.navigate(screen.route) {
-                                                popUpTo(navController.graph.startDestinationId) {
-                                                    saveState = true
+                                            try {
+                                                navController.navigate(screen.route) {
+                                                    popUpTo(Screen.Calculator.route) {
+                                                        saveState = true
+                                                    }
+                                                    launchSingleTop = true
+                                                    restoreState = true
                                                 }
-                                                launchSingleTop = true
-                                                restoreState = true
+                                            } catch (_: Exception) {
+                                                navController.navigate(screen.route)
                                             }
                                         }
                                     },
@@ -146,19 +157,6 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }
-            }
-        }
-    }
-
-    private fun checkAndRequestNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val hasPermission = ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) == PackageManager.PERMISSION_GRANTED
-
-            if (!hasPermission) {
-                requestNotificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
     }

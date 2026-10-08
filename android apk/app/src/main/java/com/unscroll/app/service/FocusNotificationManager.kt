@@ -7,7 +7,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.unscroll.app.MainActivity
+import com.unscroll.app.R
 
 object FocusNotificationManager {
     const val CHANNEL_MINDFULNESS = "channel_mindfulness"
@@ -19,110 +21,134 @@ object FocusNotificationManager {
     private const val NOTIFICATION_ID_STREAK = 1003
 
     fun createNotificationChannels(context: Context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+                    ?: return
 
-            val mindfulnessChannel = NotificationChannel(
-                CHANNEL_MINDFULNESS,
-                "Mindfulness Check-Ins",
-                NotificationManager.IMPORTANCE_DEFAULT
-            ).apply {
-                description = "Gentle habit nudges and evening reflection reminders"
+                val mindfulnessChannel = NotificationChannel(
+                    CHANNEL_MINDFULNESS,
+                    "Mindfulness Check-Ins",
+                    NotificationManager.IMPORTANCE_DEFAULT
+                ).apply {
+                    description = "Gentle habit nudges and evening reflection reminders"
+                }
+
+                val focusChannel = NotificationChannel(
+                    CHANNEL_FOCUS,
+                    "Live Focus Sessions",
+                    NotificationManager.IMPORTANCE_LOW
+                ).apply {
+                    description = "Ongoing timer status during deep work Pomodoro blocks"
+                }
+
+                val streakChannel = NotificationChannel(
+                    CHANNEL_STREAK,
+                    "Streaks & Achievements",
+                    NotificationManager.IMPORTANCE_HIGH
+                ).apply {
+                    description = "Milestone celebrations when you reclaim life hours"
+                }
+
+                manager.createNotificationChannels(listOf(mindfulnessChannel, focusChannel, streakChannel))
             }
-
-            val focusChannel = NotificationChannel(
-                CHANNEL_FOCUS,
-                "Live Focus Sessions",
-                NotificationManager.IMPORTANCE_LOW
-            ).apply {
-                description = "Ongoing timer status during deep work Pomodoro blocks"
-            }
-
-            val streakChannel = NotificationChannel(
-                CHANNEL_STREAK,
-                "Streaks & Achievements",
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "Milestone celebrations when you reclaim life hours"
-            }
-
-            manager.createNotificationChannels(listOf(mindfulnessChannel, focusChannel, streakChannel))
+        } catch (_: Exception) {
         }
     }
 
     fun showMindfulnessNudge(context: Context, title: String, message: String) {
-        val intent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        try {
+            if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) return
+
+            val intent = Intent(context, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
+            val pendingIntent = PendingIntent.getActivity(
+                context,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+            val notification = NotificationCompat.Builder(context, CHANNEL_MINDFULNESS)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(message))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+                .build()
+
+            val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+            manager?.notify(NOTIFICATION_ID_MINDFULNESS, notification)
+        } catch (_: Exception) {
         }
-        val pendingIntent = PendingIntent.getActivity(
-            context,
-            0,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        val notification = NotificationCompat.Builder(context, CHANNEL_MINDFULNESS)
-            .setSmallIcon(android.R.drawable.ic_dialog_info)
-            .setContentTitle(title)
-            .setContentText(message)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(message))
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
-            .build()
-
-        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        manager.notify(NOTIFICATION_ID_MINDFULNESS, notification)
     }
 
     fun showOngoingFocusNotification(context: Context, timeFormatted: String, taskName: String) {
-        val intent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        try {
+            if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) return
+
+            val intent = Intent(context, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
+            val pendingIntent = PendingIntent.getActivity(
+                context,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+            val notification = NotificationCompat.Builder(context, CHANNEL_FOCUS)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setContentTitle("Focus Room Active: $timeFormatted")
+                .setContentText("Intention: $taskName")
+                .setOngoing(true)
+                .setContentIntent(pendingIntent)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .build()
+
+            val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+            manager?.notify(NOTIFICATION_ID_FOCUS, notification)
+        } catch (_: Exception) {
         }
-        val pendingIntent = PendingIntent.getActivity(
-            context,
-            0,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        val notification = NotificationCompat.Builder(context, CHANNEL_FOCUS)
-            .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
-            .setContentTitle("Focus Room Active: $timeFormatted")
-            .setContentText("Intention: $taskName")
-            .setOngoing(true)
-            .setContentIntent(pendingIntent)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
-            .build()
-
-        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        manager.notify(NOTIFICATION_ID_FOCUS, notification)
     }
 
     fun cancelFocusNotification(context: Context) {
-        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        manager.cancel(NOTIFICATION_ID_FOCUS)
+        try {
+            val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+            manager?.cancel(NOTIFICATION_ID_FOCUS)
+        } catch (_: Exception) {
+        }
     }
 
     fun showStreakCelebration(context: Context, streakDays: Int, hoursReclaimed: Float) {
-        val intent = Intent(context, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(
-            context,
-            0,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        try {
+            if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) return
 
-        val notification = NotificationCompat.Builder(context, CHANNEL_STREAK)
-            .setSmallIcon(android.R.drawable.btn_star_big_on)
-            .setContentTitle("🔥 $streakDays-Day Streak Shield Unlocked!")
-            .setContentText("You've reclaimed ${"%.1f".format(hoursReclaimed)} hours from algorithmic feeds.")
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
-            .build()
+            val intent = Intent(context, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
+            val pendingIntent = PendingIntent.getActivity(
+                context,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
 
-        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        manager.notify(NOTIFICATION_ID_STREAK, notification)
+            val notification = NotificationCompat.Builder(context, CHANNEL_STREAK)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setContentTitle("🔥 $streakDays-Day Streak Shield Unlocked!")
+                .setContentText("You've reclaimed ${"%.1f".format(hoursReclaimed)} hours from algorithmic feeds.")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+                .build()
+
+            val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+            manager?.notify(NOTIFICATION_ID_STREAK, notification)
+        } catch (_: Exception) {
+        }
     }
 }

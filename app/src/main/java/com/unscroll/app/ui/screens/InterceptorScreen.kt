@@ -215,7 +215,7 @@ fun InterceptorScreen(
                         )
                     }
                     if (index < monitoredApps.size - 1) {
-                        Divider(color = BorderDark.copy(alpha = 0.5f))
+                        HorizontalDivider(color = BorderDark.copy(alpha = 0.5f))
                     }
                 }
             }

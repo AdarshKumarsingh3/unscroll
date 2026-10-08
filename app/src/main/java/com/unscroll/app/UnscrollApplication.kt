@@ -6,7 +6,9 @@ import com.unscroll.app.service.FocusNotificationManager
 class UnscrollApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        // Initialize Android system notification channels
-        FocusNotificationManager.createNotificationChannels(this)
+        try {
+            FocusNotificationManager.createNotificationChannels(this)
+        } catch (_: Exception) {
+        }
     }
 }

@@ -240,7 +240,7 @@ private fun RevenueDetails(
             Text("Institutional B2B ARR:", color = TextSecondary, fontSize = 12.sp)
             Text(b2bRev, color = TealLight, fontSize = 12.sp, fontWeight = FontWeight.Bold)
         }
-        Divider(color = BorderDark)
+        HorizontalDivider(color = BorderDark)
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text("TOTAL PROJECTED ARR:", color = EmeraldAccent, fontSize = 13.sp, fontWeight = FontWeight.Black)
             Text(total, color = EmeraldAccent, fontSize = 16.sp, fontWeight = FontWeight.Black)

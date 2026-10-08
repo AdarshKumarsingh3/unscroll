@@ -148,7 +148,7 @@ fun CalculatorScreen(
                     )
                 }
 
-                Divider(color = BorderDark)
+                HorizontalDivider(color = BorderDark)
 
                 Text(
                     text = "WHAT THAT TIME COULD HAVE BOUGHT YOU:",
