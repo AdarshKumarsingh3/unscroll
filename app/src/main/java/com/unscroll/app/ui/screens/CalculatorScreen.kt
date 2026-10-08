@@ -9,9 +9,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Book
-import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -162,14 +162,14 @@ fun CalculatorScreen(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     OpportunityItem(
-                        icon = Icons.Default.Book,
+                        icon = Icons.Default.Info,
                         title = "$booksPerYear Books",
                         subtitle = "Read cover to cover",
                         color = EmeraldAccent,
                         modifier = Modifier.weight(1f)
                     )
                     OpportunityItem(
-                        icon = Icons.Default.FitnessCenter,
+                        icon = Icons.Default.Star,
                         title = "$workoutsPerYear Gym Sprints",
                         subtitle = "1-hour sessions",
                         color = TealBright,

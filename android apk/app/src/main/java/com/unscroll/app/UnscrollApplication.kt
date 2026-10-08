@@ -1,9 +1,9 @@
 package com.unscroll.app
 
-import android.app.Application
+import androidx.multidex.MultiDexApplication
 import com.unscroll.app.service.FocusNotificationManager
 
-class UnscrollApplication : Application() {
+class UnscrollApplication : MultiDexApplication() {
     override fun onCreate() {
         super.onCreate()
         try {

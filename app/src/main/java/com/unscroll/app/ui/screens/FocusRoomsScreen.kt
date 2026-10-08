@@ -9,8 +9,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
@@ -150,7 +150,7 @@ fun FocusRoomsScreen() {
                         shape = RoundedCornerShape(14.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = TealBright)
                     ) {
-                        Icon(if (isRunning) Icons.Default.Pause else Icons.Default.PlayArrow, contentDescription = null, tint = BgDark)
+                        Icon(if (isRunning) Icons.Default.Close else Icons.Default.PlayArrow, contentDescription = null, tint = BgDark)
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(if (isRunning) "Pause" else "Start 25m Focus", color = BgDark, fontWeight = FontWeight.Bold)
                     }

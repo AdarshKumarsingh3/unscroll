@@ -25,42 +25,49 @@ class DoomscrollInterceptorService : AccessibilityService() {
 
     override fun onCreate() {
         super.onCreate()
-        preferences = UnscrollPreferences(this)
+        try {
+            preferences = UnscrollPreferences(this)
+        } catch (_: Exception) {
+        }
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
-        if (event == null || event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
-        if (!preferences.interceptorActive) return
+        try {
+            if (event == null || event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
+            if (!::preferences.isInitialized || !preferences.interceptorActive) return
 
-        val packageName = event.packageName?.toString() ?: return
+            val packageName = event.packageName?.toString() ?: return
 
-        if (monitoredPackages.contains(packageName)) {
-            val now = SystemClock.elapsedRealtime()
-            // Enforce a 60-second cooldown so user isn't stuck in infinite loop if they consciously choose to continue
-            if (now - lastInterceptTimestamp > 60_000) {
-                lastInterceptTimestamp = now
-                launchPauseScreen(packageName)
+            if (monitoredPackages.contains(packageName)) {
+                val now = SystemClock.elapsedRealtime()
+                // Enforce a 60-second cooldown so user isn't stuck in loop if they choose to continue
+                if (now - lastInterceptTimestamp > 60_000) {
+                    lastInterceptTimestamp = now
+                    launchPauseScreen(packageName)
+                }
             }
+        } catch (_: Exception) {
         }
     }
 
     private fun launchPauseScreen(targetPackage: String) {
-        val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            putExtra("EXTRA_INTERCEPTED_PACKAGE", targetPackage)
-            putExtra("EXTRA_NAV_TARGET", "interceptor")
-        }
-        startActivity(intent)
+        try {
+            val intent = Intent(this, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                putExtra("EXTRA_INTERCEPTED_PACKAGE", targetPackage)
+                putExtra("EXTRA_NAV_TARGET", "interceptor")
+            }
+            startActivity(intent)
 
-        // Show immediate mindfulness reminder notification
-        FocusNotificationManager.showMindfulnessNudge(
-            this,
-            "Pause. Is this conscious?",
-            "Unscroll paused $targetPackage. Take 1 deep breath before you proceed."
-        )
+            FocusNotificationManager.showMindfulnessNudge(
+                this,
+                "Pause. Is this conscious?",
+                "Unscroll paused $targetPackage. Take 1 deep breath before you proceed."
+            )
+        } catch (_: Exception) {
+        }
     }
 
     override fun onInterrupt() {
-        // Service interrupted
     }
 }

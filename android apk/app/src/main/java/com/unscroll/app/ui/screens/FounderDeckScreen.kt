@@ -7,10 +7,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Business
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.MonetizationOn
-import androidx.compose.material.icons.filled.Timeline
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -85,7 +84,7 @@ fun FounderDeckScreen() {
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Icon(Icons.Default.Timeline, contentDescription = null, tint = TealBright)
+                    Icon(Icons.Default.ThumbUp, contentDescription = null, tint = TealBright)
                     Text("THE 90-DAY EXECUTION MODEL", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                 }
 
@@ -121,7 +120,7 @@ fun FounderDeckScreen() {
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Icon(Icons.Default.MonetizationOn, contentDescription = null, tint = AmberAccent)
+                    Icon(Icons.Default.Star, contentDescription = null, tint = AmberAccent)
                     Text("YEAR 1 REVENUE MODELS", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                 }
 
@@ -162,7 +161,7 @@ fun FounderDeckScreen() {
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Icon(Icons.Default.Business, contentDescription = null, tint = EmeraldAccent)
+                    Icon(Icons.Default.Home, contentDescription = null, tint = EmeraldAccent)
                     Text("ACTION ITEMS NEEDED FROM FOUNDER", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                 }
 

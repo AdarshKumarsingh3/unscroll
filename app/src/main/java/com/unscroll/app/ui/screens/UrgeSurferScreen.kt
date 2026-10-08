@@ -15,10 +15,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Waves
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -192,7 +191,7 @@ fun UrgeSurferScreen(
                                 )
                             } else {
                                 Icon(
-                                    Icons.Default.Waves,
+                                    Icons.Default.PlayArrow,
                                     contentDescription = null,
                                     tint = TealLight,
                                     modifier = Modifier.size(36.dp)
@@ -206,7 +205,7 @@ fun UrgeSurferScreen(
 
                     // Progress Bar
                     LinearProgressIndicator(
-                        progress = { (90f - secondsRemaining) / 90f },
+                        progress = ((90f - secondsRemaining) / 90f),
                         modifier = Modifier
                             .fillMaxWidth(0.8f)
                             .height(6.dp)

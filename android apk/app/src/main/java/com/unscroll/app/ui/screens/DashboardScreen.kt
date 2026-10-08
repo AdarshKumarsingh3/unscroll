@@ -10,8 +10,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.LocalFireDepartment
-import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -120,7 +120,7 @@ fun DashboardScreen() {
                 shape = RoundedCornerShape(12.dp),
                 border = androidx.compose.foundation.BorderStroke(1.dp, TealBright)
             ) {
-                Icon(Icons.Default.NotificationsActive, contentDescription = null, tint = TealBright)
+                Icon(Icons.Default.Notifications, contentDescription = null, tint = TealBright)
                 Spacer(modifier = Modifier.width(4.dp))
                 Text("Test Nudge", color = TealLight, fontSize = 11.sp)
             }

@@ -1,5 +1,5 @@
 <resources>
-    <style name="Theme.Unscroll" parent="android:Theme.Material.NoActionBar">
+    <style name="Theme.Unscroll" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:statusBarColor">#090D16</item>
         <item name="android:navigationBarColor">#090D16</item>
         <item name="android:windowBackground">#090D16</item>
