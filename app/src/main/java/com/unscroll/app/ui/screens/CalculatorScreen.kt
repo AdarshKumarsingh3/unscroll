@@ -8,11 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,10 +16,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.unscroll.app.R
 import com.unscroll.app.ui.theme.*
+import java.util.Locale
 
 @Composable
 fun CalculatorScreen(
@@ -101,7 +99,7 @@ fun CalculatorScreen(
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        text = "${"%.1f".format(dailyHours)} hrs/day",
+                        text = "${String.format(Locale.US, "%.1f", dailyHours)} hrs/day",
                         color = TealLight,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
@@ -127,21 +125,21 @@ fun CalculatorScreen(
                 ) {
                     MetricBox(
                         title = "24h Days / Yr",
-                        value = "${"%.1f".format(fullDaysPerYear)} d",
+                        value = "${String.format(Locale.US, "%.1f", fullDaysPerYear)} d",
                         subtitle = "Full 24-hr days lost",
                         accentColor = RoseDanger,
                         modifier = Modifier.weight(1f)
                     )
                     MetricBox(
                         title = "Waking Days",
-                        value = "${"%.1f".format(wakingDaysPerYear)} d",
+                        value = "${String.format(Locale.US, "%.1f", wakingDaysPerYear)} d",
                         subtitle = "Equivalent 16h days",
                         accentColor = AmberAccent,
                         modifier = Modifier.weight(1f)
                     )
                     MetricBox(
                         title = "Over 30 Yrs",
-                        value = "${"%.1f".format(lifetime30Years)} yrs",
+                        value = "${String.format(Locale.US, "%.1f", lifetime30Years)} yrs",
                         subtitle = "Of pure life stolen",
                         accentColor = PurpleAccent,
                         modifier = Modifier.weight(1f)
@@ -162,14 +160,14 @@ fun CalculatorScreen(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     OpportunityItem(
-                        icon = Icons.Default.Info,
+                        iconRes = R.drawable.ic_nav_calculator,
                         title = "$booksPerYear Books",
                         subtitle = "Read cover to cover",
                         color = EmeraldAccent,
                         modifier = Modifier.weight(1f)
                     )
                     OpportunityItem(
-                        icon = Icons.Default.Star,
+                        iconRes = R.drawable.ic_nav_replacements,
                         title = "$workoutsPerYear Gym Sprints",
                         subtitle = "1-hour sessions",
                         color = TealBright,
@@ -207,7 +205,7 @@ fun CalculatorScreen(
                 )
 
                 Text(
-                    text = "At ${"%.1f".format(dailyHours)}h/day, I lose ${"%.1f".format(fullDaysPerYear)} full days every year to doomscrolling. That's $booksPerYear books stolen by algorithms.",
+                    text = "At ${String.format(Locale.US, "%.1f", dailyHours)}h/day, I lose ${String.format(Locale.US, "%.1f", fullDaysPerYear)} full days every year to doomscrolling. That's $booksPerYear books stolen by algorithms.",
                     color = Color.White,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Medium,
@@ -222,7 +220,7 @@ fun CalculatorScreen(
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = TealPrimary)
                 ) {
-                    Icon(Icons.Default.Share, contentDescription = null, tint = Color.White)
+                    Icon(painter = painterResource(R.drawable.ic_nav_pitch), contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Share Result to WhatsApp / Instagram", color = Color.White, fontWeight = FontWeight.Bold)
                 }
@@ -281,7 +279,7 @@ private fun MetricBox(
 
 @Composable
 private fun OpportunityItem(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    iconRes: Int,
     title: String,
     subtitle: String,
     color: Color,
@@ -296,7 +294,7 @@ private fun OpportunityItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(24.dp))
+        Icon(painter = painterResource(iconRes), contentDescription = null, tint = color, modifier = Modifier.size(22.dp))
         Column {
             Text(title, color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
             Text(subtitle, color = TextTertiary, fontSize = 10.sp)
@@ -305,14 +303,17 @@ private fun OpportunityItem(
 }
 
 private fun shareScreenTimeReport(context: Context, dailyHours: Float, daysLost: Float, books: Int) {
-    val sendIntent = Intent().apply {
-        action = Intent.ACTION_SEND
-        putExtra(
-            Intent.EXTRA_TEXT,
-            "🚨 I just audited my screen-time on Unscroll: At ${"%.1f".format(dailyHours)}h/day, I lose ${"%.1f".format(daysLost)} full 24-hr days every year to short-form feeds! That's $books books stolen. Reclaim your attention with Unscroll: The Anti-Doomscroll Habit OS."
-        )
-        type = "text/plain"
+    try {
+        val sendIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(
+                Intent.EXTRA_TEXT,
+                "🚨 I just audited my screen-time on Unscroll: At ${String.format(Locale.US, "%.1f", dailyHours)}h/day, I lose ${String.format(Locale.US, "%.1f", daysLost)} full 24-hr days every year to short-form feeds! That's $books books stolen. Reclaim your attention with Unscroll: The Anti-Doomscroll Habit OS."
+            )
+            type = "text/plain"
+        }
+        val shareIntent = Intent.createChooser(sendIntent, "Share Screen-Time Cost")
+        context.startActivity(shareIntent)
+    } catch (_: Exception) {
     }
-    val shareIntent = Intent.createChooser(sendIntent, "Share Screen-Time Cost")
-    context.startActivity(shareIntent)
 }

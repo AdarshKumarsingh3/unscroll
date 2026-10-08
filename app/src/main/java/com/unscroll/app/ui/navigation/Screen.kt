@@ -1,33 +1,25 @@
 package com.unscroll.app.ui.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.ThumbUp
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.annotation.DrawableRes
+import com.unscroll.app.R
 
-sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
-    object Calculator : Screen("calculator", "Cost", Icons.Default.Info)
-    object Interceptor : Screen("interceptor", "Shield", Icons.Default.Lock)
-    object UrgeSurfer : Screen("urge_surfer", "90s Wave", Icons.Default.PlayArrow)
-    object Replacements : Screen("replacements", "Bites", Icons.Default.Star)
-    object FocusRooms : Screen("focus_rooms", "Focus", Icons.Default.Notifications)
-    object Dashboard : Screen("dashboard", "Saved", Icons.Default.ThumbUp)
-    object FounderDeck : Screen("founder_deck", "Pitch", Icons.Default.Share)
+sealed class Screen(val route: String, val title: String, @DrawableRes val iconRes: Int) {
+    object Calculator : Screen("calculator", "Cost", R.drawable.ic_nav_calculator)
+    object Interceptor : Screen("interceptor", "Shield", R.drawable.ic_nav_interceptor)
+    object UrgeSurfer : Screen("urge_surfer", "90s Wave", R.drawable.ic_nav_urge)
+    object Replacements : Screen("replacements", "Bites", R.drawable.ic_nav_replacements)
+    object FocusRooms : Screen("focus_rooms", "Focus", R.drawable.ic_nav_focus)
+    object Dashboard : Screen("dashboard", "Saved", R.drawable.ic_nav_dashboard)
+    object FounderDeck : Screen("founder_deck", "Pitch", R.drawable.ic_nav_pitch)
 
     companion object {
+        // Primary 5 navigation bar items conforming to Material 3 standard
         val bottomNavItems = listOf(
             Calculator,
             Interceptor,
             UrgeSurfer,
             Replacements,
-            FocusRooms,
-            Dashboard,
-            FounderDeck
+            Dashboard
         )
     }
 }

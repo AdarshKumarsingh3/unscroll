@@ -11,11 +11,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,9 +18,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.unscroll.app.R
 import com.unscroll.app.data.UnscrollPreferences
 import com.unscroll.app.service.SoundSynthesizer
 import com.unscroll.app.ui.theme.*
@@ -148,7 +145,7 @@ fun InterceptorScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Icon(Icons.Default.Lock, contentDescription = null, tint = TealBright)
+                    Icon(painter = painterResource(R.drawable.ic_nav_interceptor), contentDescription = null, tint = TealBright, modifier = Modifier.size(20.dp))
                     Text(
                         text = "Android Accessibility Permission",
                         color = Color.White,
@@ -166,14 +163,16 @@ fun InterceptorScreen(
 
                 Button(
                     onClick = {
-                        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-                        context.startActivity(intent)
+                        try {
+                            val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                            context.startActivity(intent)
+                        } catch (_: Exception) {}
                     },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = TealPrimary)
                 ) {
-                    Icon(Icons.Default.Settings, contentDescription = null, tint = Color.White)
+                    Icon(painter = painterResource(R.drawable.ic_nav_calculator), contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Enable in Android Settings", color = Color.White, fontWeight = FontWeight.Bold)
                 }
@@ -231,7 +230,7 @@ fun InterceptorScreen(
             shape = RoundedCornerShape(14.dp),
             colors = ButtonDefaults.buttonColors(containerColor = EmeraldAccent)
         ) {
-            Icon(Icons.Default.PlayArrow, contentDescription = null, tint = BgDark)
+            Icon(painter = painterResource(R.drawable.ic_nav_urge), contentDescription = null, tint = BgDark, modifier = Modifier.size(18.dp))
             Spacer(modifier = Modifier.width(8.dp))
             Text("Simulate Feed Interception", color = BgDark, fontWeight = FontWeight.Bold)
         }
@@ -301,7 +300,7 @@ private fun PauseScreenSimulationModal(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "You opened Instagram Reels. Take one deep breath.",
+                    text = "You opened a social feed. Take one deep breath.",
                     color = TextSecondary,
                     fontSize = 12.sp,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center

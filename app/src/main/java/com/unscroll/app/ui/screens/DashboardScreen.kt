@@ -1,17 +1,11 @@
 package com.unscroll.app.ui.screens
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,12 +13,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.unscroll.app.R
 import com.unscroll.app.data.UnscrollPreferences
 import com.unscroll.app.service.FocusNotificationManager
 import com.unscroll.app.ui.theme.*
+import java.util.Locale
 
 @Composable
 fun DashboardScreen() {
@@ -72,7 +69,7 @@ fun DashboardScreen() {
         ) {
             KpiCard(
                 title = "HOURS RECLAIMED",
-                value = "${"%.1f".format(hoursReclaimed)}h",
+                value = "${String.format(Locale.US, "%.1f", hoursReclaimed)}h",
                 subtitle = "Life redirected from feeds",
                 accentColor = TealBright,
                 modifier = Modifier.weight(1f)
@@ -103,7 +100,7 @@ fun DashboardScreen() {
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = TealPrimary)
             ) {
-                Icon(Icons.Default.Add, contentDescription = null, tint = Color.White)
+                Icon(painter = painterResource(R.drawable.ic_nav_replacements), contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
                 Spacer(modifier = Modifier.width(4.dp))
                 Text("Log Urge (+15m)", fontSize = 11.sp, fontWeight = FontWeight.Bold)
             }
@@ -113,14 +110,14 @@ fun DashboardScreen() {
                     FocusNotificationManager.showMindfulnessNudge(
                         context,
                         "Mindfulness Moment",
-                        "You have reclaimed ${"%.1f".format(hoursReclaimed)} hours! What will you create today?"
+                        "You have reclaimed ${String.format(Locale.US, "%.1f", hoursReclaimed)} hours! What will you create today?"
                     )
                 },
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(12.dp),
                 border = androidx.compose.foundation.BorderStroke(1.dp, TealBright)
             ) {
-                Icon(Icons.Default.Notifications, contentDescription = null, tint = TealBright)
+                Icon(painter = painterResource(R.drawable.ic_notification), contentDescription = null, tint = TealBright, modifier = Modifier.size(16.dp))
                 Spacer(modifier = Modifier.width(4.dp))
                 Text("Test Nudge", color = TealLight, fontSize = 11.sp)
             }
@@ -199,7 +196,7 @@ private fun MilestoneItem(title: String, desc: String, achieved: Boolean) {
             contentAlignment = Alignment.Center
         ) {
             if (achieved) {
-                Icon(Icons.Default.Check, contentDescription = null, tint = BgDark, modifier = Modifier.size(16.dp))
+                Icon(painter = painterResource(R.drawable.ic_nav_interceptor), contentDescription = null, tint = BgDark, modifier = Modifier.size(16.dp))
             }
         }
 

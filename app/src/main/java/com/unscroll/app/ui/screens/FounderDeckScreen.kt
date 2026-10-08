@@ -6,19 +6,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.unscroll.app.R
 import com.unscroll.app.ui.theme.*
 
 @Composable
@@ -84,7 +82,7 @@ fun FounderDeckScreen() {
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Icon(Icons.Default.ThumbUp, contentDescription = null, tint = TealBright)
+                    Icon(painter = painterResource(R.drawable.ic_nav_dashboard), contentDescription = null, tint = TealBright, modifier = Modifier.size(18.dp))
                     Text("THE 90-DAY EXECUTION MODEL", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                 }
 
@@ -120,7 +118,7 @@ fun FounderDeckScreen() {
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Icon(Icons.Default.Star, contentDescription = null, tint = AmberAccent)
+                    Icon(painter = painterResource(R.drawable.ic_nav_replacements), contentDescription = null, tint = AmberAccent, modifier = Modifier.size(18.dp))
                     Text("YEAR 1 REVENUE MODELS", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                 }
 
@@ -161,7 +159,7 @@ fun FounderDeckScreen() {
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Icon(Icons.Default.Home, contentDescription = null, tint = EmeraldAccent)
+                    Icon(painter = painterResource(R.drawable.ic_nav_pitch), contentDescription = null, tint = EmeraldAccent, modifier = Modifier.size(18.dp))
                     Text("ACTION ITEMS NEEDED FROM FOUNDER", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                 }
 

@@ -14,10 +14,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,9 +23,11 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.unscroll.app.R
 import com.unscroll.app.data.UnscrollPreferences
 import com.unscroll.app.service.FocusNotificationManager
 import com.unscroll.app.service.SoundSynthesizer
@@ -191,7 +189,7 @@ fun UrgeSurferScreen(
                                 )
                             } else {
                                 Icon(
-                                    Icons.Default.PlayArrow,
+                                    painter = painterResource(R.drawable.ic_nav_urge),
                                     contentDescription = null,
                                     tint = TealLight,
                                     modifier = Modifier.size(36.dp)
@@ -205,7 +203,7 @@ fun UrgeSurferScreen(
 
                     // Progress Bar
                     LinearProgressIndicator(
-                        progress = ((90f - secondsRemaining) / 90f),
+                        progress = ((90f - secondsRemaining) / 90f).coerceIn(0f, 1f),
                         modifier = Modifier
                             .fillMaxWidth(0.8f)
                             .height(6.dp)
@@ -230,7 +228,7 @@ fun UrgeSurferScreen(
                             shape = RoundedCornerShape(14.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = TealPrimary)
                         ) {
-                            Icon(Icons.Default.PlayArrow, contentDescription = null, tint = Color.White)
+                            Icon(painter = painterResource(R.drawable.ic_nav_urge), contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(if (isRunning) "Pause Wave" else "Start 90s Surfer", fontWeight = FontWeight.Bold)
                         }
@@ -241,7 +239,7 @@ fun UrgeSurferScreen(
                                 secondsRemaining = 90
                             }
                         ) {
-                            Icon(Icons.Default.Refresh, contentDescription = null, tint = TextSecondary)
+                            Icon(painter = painterResource(R.drawable.ic_nav_focus), contentDescription = null, tint = TextSecondary, modifier = Modifier.size(20.dp))
                         }
                     }
                 } else {
@@ -251,7 +249,7 @@ fun UrgeSurferScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Icon(
-                            Icons.Default.Check,
+                            painter = painterResource(R.drawable.ic_nav_interceptor),
                             contentDescription = null,
                             tint = EmeraldAccent,
                             modifier = Modifier.size(64.dp)
@@ -322,20 +320,23 @@ fun UrgeSurferScreen(
     }
 }
 
-// Physical phone vibration when tapping the circle
+// Physical phone vibration when tapping the circle with complete safety
 private fun triggerPhoneHaptic(context: Context) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        val vibratorManager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager
-        val vibrator = vibratorManager?.defaultVibrator
-        vibrator?.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK))
-    } else {
-        @Suppress("DEPRECATION")
-        val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            vibrator?.vibrate(VibrationEffect.createOneShot(30, VibrationEffect.DEFAULT_AMPLITUDE))
+    try {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val vibratorManager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager
+            val vibrator = vibratorManager?.defaultVibrator
+            vibrator?.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK))
         } else {
             @Suppress("DEPRECATION")
-            vibrator?.vibrate(30)
+            val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator?.vibrate(VibrationEffect.createOneShot(30, VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                @Suppress("DEPRECATION")
+                vibrator?.vibrate(30)
+            }
         }
+    } catch (_: Exception) {
     }
 }

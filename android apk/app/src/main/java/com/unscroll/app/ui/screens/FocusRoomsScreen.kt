@@ -1,6 +1,5 @@
 package com.unscroll.app.ui.screens
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -8,11 +7,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,9 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.unscroll.app.R
 import com.unscroll.app.data.FocusPeer
 import com.unscroll.app.data.UnscrollPreferences
 import com.unscroll.app.service.FocusNotificationManager
@@ -37,13 +33,13 @@ fun FocusRoomsScreen() {
 
     var isRunning by remember { mutableStateOf(false) }
     var secondsLeft by remember { mutableIntStateOf(25 * 60) }
-    var userTask by remember { mutableStateOf("Reviewing proposal & writing Kotlin app") }
+    var userTask by remember { mutableStateOf("Deep flow block & habit rewiring") }
     var cheersCount by remember { mutableIntStateOf(148) }
 
     val formattedTime = remember(secondsLeft) {
         val m = secondsLeft / 60
         val s = secondsLeft % 60
-        "%02d:%02d".format(m, s)
+        "%02d:%02d".format(java.util.Locale.US, m, s)
     }
 
     val peers = remember {
@@ -150,7 +146,12 @@ fun FocusRoomsScreen() {
                         shape = RoundedCornerShape(14.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = TealBright)
                     ) {
-                        Icon(if (isRunning) Icons.Default.Close else Icons.Default.PlayArrow, contentDescription = null, tint = BgDark)
+                        Icon(
+                            painter = painterResource(if (isRunning) R.drawable.ic_nav_focus else R.drawable.ic_nav_urge),
+                            contentDescription = null,
+                            tint = BgDark,
+                            modifier = Modifier.size(18.dp)
+                        )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(if (isRunning) "Pause" else "Start 25m Focus", color = BgDark, fontWeight = FontWeight.Bold)
                     }
@@ -162,13 +163,13 @@ fun FocusRoomsScreen() {
                             FocusNotificationManager.cancelFocusNotification(context)
                         }
                     ) {
-                        Icon(Icons.Default.Refresh, contentDescription = null, tint = TextSecondary)
+                        Icon(painter = painterResource(R.drawable.ic_nav_focus), contentDescription = null, tint = TextSecondary, modifier = Modifier.size(20.dp))
                     }
 
                     IconButton(
                         onClick = { cheersCount++ }
                     ) {
-                        Icon(Icons.Default.Favorite, contentDescription = null, tint = RoseDanger)
+                        Icon(painter = painterResource(R.drawable.ic_nav_replacements), contentDescription = null, tint = RoseDanger, modifier = Modifier.size(20.dp))
                     }
                 }
 

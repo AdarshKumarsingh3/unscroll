@@ -27,6 +27,7 @@ import com.unscroll.app.data.UnscrollPreferences
 import com.unscroll.app.service.SoundSynthesizer
 import com.unscroll.app.ui.theme.*
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun ReplacementsScreen(
@@ -262,12 +263,13 @@ private fun BiteCard(
     }
 }
 
-// 1. Reflex Sprint Mini-Game Modal
+// 1. Reflex Sprint Mini-Game Modal with Coroutine Safety
 @Composable
 private fun ReflexGameModal(onDismiss: () -> Unit, onComplete: () -> Unit) {
     var gameState by remember { mutableStateOf("IDLE") } // IDLE, WAITING, READY, DONE
     var reactionTimeMs by remember { mutableLongStateOf(0L) }
     var startTime by remember { mutableLongStateOf(0L) }
+    val scope = rememberCoroutineScope()
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -321,11 +323,11 @@ private fun ReflexGameModal(onDismiss: () -> Unit, onComplete: () -> Unit) {
                     Button(
                         onClick = {
                             gameState = "WAITING"
-                            Thread {
-                                Thread.sleep((1500..3500).random().toLong())
+                            scope.launch {
+                                delay((1500L..3500L).random())
                                 startTime = System.currentTimeMillis()
                                 gameState = "READY"
-                            }.start()
+                            }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = TealBright)
                     ) {
@@ -460,9 +462,12 @@ private fun MentalModelModal(onDismiss: () -> Unit, onComplete: () -> Unit) {
 }
 
 private fun sendFriendSms(context: Context) {
-    val intent = Intent(Intent.ACTION_SENDTO).apply {
-        data = Uri.parse("smsto:")
-        putExtra("sms_body", "Hey! Was just thinking of you and wanted to check in. Hope you're having an awesome week!")
+    try {
+        val intent = Intent(Intent.ACTION_SENDTO).apply {
+            data = Uri.parse("smsto:")
+            putExtra("sms_body", "Hey! Was just thinking of you and wanted to check in. Hope you're having an awesome week!")
+        }
+        context.startActivity(intent)
+    } catch (_: Exception) {
     }
-    context.startActivity(intent)
 }
