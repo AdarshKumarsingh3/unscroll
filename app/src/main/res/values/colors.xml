@@ -1,0 +1,8 @@
+<resources>
+    <color name="bg_dark">#090D16</color>
+    <color name="teal_primary">#0D9488</color>
+    <color name="teal_bright">#14B8A6</color>
+    <color name="emerald_accent">#10B981</color>
+    <color name="amber_warning">#F59E0B</color>
+    <color name="rose_danger">#F43F5E</color>
+</resources>

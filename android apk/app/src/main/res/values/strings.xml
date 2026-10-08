@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Unscroll</string>
+    <string name="accessibility_service_description">Unscroll monitors designated social feed apps (Instagram Reels, TikTok, YouTube Shorts, X, Reddit) to provide a gentle 5-second mindfulness pause and dopamine-replacement activities before mindless doomscrolling begins.</string>
+    <string name="notification_channel_mindfulness_name">Mindfulness Check-Ins</string>
+    <string name="notification_channel_mindfulness_desc">Gentle habit nudges and evening reflection reminders</string>
+    <string name="notification_channel_focus_name">Live Focus Mode</string>
+    <string name="notification_channel_focus_desc">Ongoing timer notification during deep Pomodoro focus sessions</string>
+    <string name="notification_channel_streak_name">Streak &amp; Saved Hours</string>
+    <string name="notification_channel_streak_desc">Celebrations when you reclaim time and beat craving peaks</string>
+</resources>
