@@ -1,4 +1,4 @@
-package com.unscroll.app.ui.screens
+﻿package com.unscroll.app.ui.screens
 
 import android.content.Context
 import android.content.Intent
@@ -57,7 +57,7 @@ fun CalculatorScreen(
                 .padding(horizontal = 12.dp, vertical = 6.dp)
         ) {
             Text(
-                text = "⚡ Top-of-Funnel Viral Engine • 30%+ Share Rate",
+                text = " Top-of-Funnel Viral Engine  30%+ Share Rate",
                 color = TealLight,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Medium
@@ -198,7 +198,7 @@ fun CalculatorScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text(
-                    text = "📢 SHAREABLE RESULT CARD",
+                    text = " SHAREABLE RESULT CARD",
                     color = TealLight,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold
@@ -308,7 +308,7 @@ private fun shareScreenTimeReport(context: Context, dailyHours: Float, daysLost:
             action = Intent.ACTION_SEND
             putExtra(
                 Intent.EXTRA_TEXT,
-                "🚨 I just audited my screen-time on Unscroll: At ${String.format(Locale.US, "%.1f", dailyHours)}h/day, I lose ${String.format(Locale.US, "%.1f", daysLost)} full 24-hr days every year to short-form feeds! That's $books books stolen. Reclaim your attention with Unscroll: The Anti-Doomscroll Habit OS."
+                " I just audited my screen-time on Unscroll: At ${String.format(Locale.US, "%.1f", dailyHours)}h/day, I lose ${String.format(Locale.US, "%.1f", daysLost)} full 24-hr days every year to short-form feeds! That's $books books stolen. Reclaim your attention with Unscroll: The Anti-Doomscroll Habit OS."
             )
             type = "text/plain"
         }
@@ -317,3 +317,4 @@ private fun shareScreenTimeReport(context: Context, dailyHours: Float, daysLost:
     } catch (_: Exception) {
     }
 }
+

@@ -1,4 +1,4 @@
-package com.unscroll.app.ui.screens
+﻿package com.unscroll.app.ui.screens
 
 import android.content.Context
 import android.os.Build
@@ -109,7 +109,7 @@ fun UrgeSurferScreen(
                 .padding(horizontal = 14.dp, vertical = 6.dp)
         ) {
             Text(
-                text = "🌊 Dr. Marlatt's Craving Wave Protocol • 90 Seconds",
+                text = " Dr. Marlatt's Craving Wave Protocol  90 Seconds",
                 color = TealLight,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Medium
@@ -183,7 +183,7 @@ fun UrgeSurferScreen(
                                     fontWeight = FontWeight.Black
                                 )
                                 Text(
-                                    text = "👆 Tap circle ($tapsCount)",
+                                    text = " Tap circle ($tapsCount)",
                                     color = TextSecondary,
                                     fontSize = 10.sp
                                 )
@@ -340,3 +340,4 @@ private fun triggerPhoneHaptic(context: Context) {
     } catch (_: Exception) {
     }
 }
+

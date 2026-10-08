@@ -1,12 +1,12 @@
-package com.unscroll.app.data
+﻿package com.unscroll.app.data
 
 enum class TriggerCategory(val displayName: String, val emoji: String) {
-    BORED("Bored", "🥱"),
-    STRESSED("Stressed / Anxious", "⚡"),
-    RESTLESS("Restless / Sluggish", "🪑"),
-    LONELY("Lonely", "💬"),
-    PRODUCTIVE("Want to Produce", "🎯"),
-    LEARN("Want to Learn", "🧠")
+    BORED("Bored", ""),
+    STRESSED("Stressed / Anxious", ""),
+    RESTLESS("Restless / Sluggish", ""),
+    LONELY("Lonely", ""),
+    PRODUCTIVE("Want to Produce", ""),
+    LEARN("Want to Learn", "")
 }
 
 data class ReplacementActivity(
@@ -31,3 +31,4 @@ data class AppInterceptTarget(
     val appName: String,
     val isMonitored: Boolean
 )
+

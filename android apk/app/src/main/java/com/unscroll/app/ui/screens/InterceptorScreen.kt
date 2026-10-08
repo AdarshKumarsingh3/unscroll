@@ -1,4 +1,4 @@
-package com.unscroll.app.ui.screens
+﻿package com.unscroll.app.ui.screens
 
 import android.content.Context
 import android.content.Intent
@@ -70,7 +70,7 @@ fun InterceptorScreen(
                 .padding(horizontal = 14.dp, vertical = 6.dp)
         ) {
             Text(
-                text = if (isShieldActive) "● Active Android Interceptor Shield" else "○ Shield Paused",
+                text = if (isShieldActive) " Active Android Interceptor Shield" else " Shield Paused",
                 color = if (isShieldActive) EmeraldAccent else RoseDanger,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold
@@ -286,7 +286,7 @@ private fun PauseScreenSimulationModal(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = if (countdown > 0) "${countdown}s" else "✨",
+                        text = if (countdown > 0) "${countdown}s" else "",
                         color = Color.White,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
@@ -343,7 +343,7 @@ private fun PauseScreenSimulationModal(
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = TealBright)
                 ) {
-                    Text("🌊 Ride 90s Urge Surfer", color = BgDark, fontWeight = FontWeight.Bold)
+                    Text(" Ride 90s Urge Surfer", color = BgDark, fontWeight = FontWeight.Bold)
                 }
 
                 OutlinedButton(
@@ -352,7 +352,7 @@ private fun PauseScreenSimulationModal(
                     shape = RoundedCornerShape(12.dp),
                     border = androidx.compose.foundation.BorderStroke(1.dp, BorderDark)
                 ) {
-                    Text("⚡ Play 30s Dopamine Bite", color = Color.White)
+                    Text(" Play 30s Dopamine Bite", color = Color.White)
                 }
             }
         },
@@ -363,3 +363,4 @@ private fun PauseScreenSimulationModal(
         }
     )
 }
+

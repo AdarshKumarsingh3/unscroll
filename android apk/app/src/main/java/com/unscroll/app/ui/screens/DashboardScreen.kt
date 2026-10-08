@@ -1,4 +1,4 @@
-package com.unscroll.app.ui.screens
+﻿package com.unscroll.app.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -49,7 +49,7 @@ fun DashboardScreen() {
                 .padding(horizontal = 14.dp, vertical = 6.dp)
         ) {
             Text(
-                text = "📊 Visible Progress & Dopamine Rewiring Engine",
+                text = " Visible Progress & Dopamine Rewiring Engine",
                 color = TealLight,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Medium
@@ -206,3 +206,4 @@ private fun MilestoneItem(title: String, desc: String, achieved: Boolean) {
         }
     }
 }
+

@@ -1,4 +1,4 @@
-package com.unscroll.app.service
+﻿package com.unscroll.app.service
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -139,7 +139,7 @@ object FocusNotificationManager {
 
             val notification = NotificationCompat.Builder(context, CHANNEL_STREAK)
                 .setSmallIcon(R.drawable.ic_notification)
-                .setContentTitle("🔥 $streakDays-Day Streak Shield Unlocked!")
+                .setContentTitle(" $streakDays-Day Streak Shield Unlocked!")
                 .setContentText("You've reclaimed ${String.format(java.util.Locale.US, "%.1f", hoursReclaimed)} hours from algorithmic feeds.")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setContentIntent(pendingIntent)

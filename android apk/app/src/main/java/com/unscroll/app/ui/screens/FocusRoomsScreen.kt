@@ -1,4 +1,4 @@
-package com.unscroll.app.ui.screens
+﻿package com.unscroll.app.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -44,10 +44,10 @@ fun FocusRoomsScreen() {
 
     val peers = remember {
         listOf(
-            FocusPeer("1", "Sarah K.", "🇺🇸", "Writing psychology thesis chapter", 18),
-            FocusPeer("2", "Marcus L.", "🇩🇪", "Mobile UI system refactor in Jetpack Compose", 22),
-            FocusPeer("3", "Priya N.", "🇮🇳", "Studying biochem metabolic pathways", 12),
-            FocusPeer("4", "Kenji T.", "🇯🇵", "Async Kotlin coroutines architecture", 24)
+            FocusPeer("1", "Sarah K.", "", "Writing psychology thesis chapter", 18),
+            FocusPeer("2", "Marcus L.", "", "Mobile UI system refactor in Jetpack Compose", 22),
+            FocusPeer("3", "Priya N.", "", "Studying biochem metabolic pathways", 12),
+            FocusPeer("4", "Kenji T.", "", "Async Kotlin coroutines architecture", 24)
         )
     }
 
@@ -88,7 +88,7 @@ fun FocusRoomsScreen() {
                 .padding(horizontal = 14.dp, vertical = 6.dp)
         ) {
             Text(
-                text = "👥 Global Room 01 • 318 Focusers Live",
+                text = " Global Room 01  318 Focusers Live",
                 color = TealLight,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Medium
@@ -236,3 +236,4 @@ fun FocusRoomsScreen() {
         }
     }
 }
+

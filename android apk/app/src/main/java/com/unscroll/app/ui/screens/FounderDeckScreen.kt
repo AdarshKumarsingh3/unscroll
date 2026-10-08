@@ -1,4 +1,4 @@
-package com.unscroll.app.ui.screens
+﻿package com.unscroll.app.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -41,7 +41,7 @@ fun FounderDeckScreen() {
                 .padding(horizontal = 14.dp, vertical = 6.dp)
         ) {
             Text(
-                text = "💼 Prepared for the Founders & Executive Team",
+                text = " Prepared for the Founders & Executive Team",
                 color = AmberAccent,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold
@@ -87,19 +87,19 @@ fun FounderDeckScreen() {
                 }
 
                 PhaseItem(
-                    phase = "Phase 1: Foundation (Days 1–30)",
+                    phase = "Phase 1: Foundation (Days 130)",
                     goal = "Viral Cost Calculator, Urge Surfer, landing page.",
                     gate = "Gate: 500+ completions / waitlist signups."
                 )
 
                 PhaseItem(
-                    phase = "Phase 2: Retention Core (Days 31–60)",
+                    phase = "Phase 2: Retention Core (Days 3160)",
                     goal = "Android Interceptor, 30+ activity bites, user dashboard.",
-                    gate = "Gate: Day-7 Retention ≥ 25%."
+                    gate = "Gate: Day-7 Retention  25%."
                 )
 
                 PhaseItem(
-                    phase = "Phase 3: Community & Scale (Days 61–90)",
+                    phase = "Phase 3: Community & Scale (Days 6190)",
                     goal = "Live Focus Rooms, Stripe/Play billing, 2-3 B2B pilots.",
                     gate = "Gate: 5k-10k registered users, first paying subscribers."
                 )
@@ -163,10 +163,10 @@ fun FounderDeckScreen() {
                     Text("ACTION ITEMS NEEDED FROM FOUNDER", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                 }
 
-                Text("• Approve 90-day plan and focus on doomscrolling first.", color = TextSecondary, fontSize = 12.sp)
-                Text("• Confirm budget, engineering team & weekly time commitment.", color = TextSecondary, fontSize = 12.sp)
-                Text("• Authorize outreach to 2 to 3 pilot institutions ($12/seat/yr).", color = TextSecondary, fontSize = 12.sp)
-                Text("• Agree on Phase gates (waitlist size & D-7 retention).", color = TextSecondary, fontSize = 12.sp)
+                Text(" Approve 90-day plan and focus on doomscrolling first.", color = TextSecondary, fontSize = 12.sp)
+                Text(" Confirm budget, engineering team & weekly time commitment.", color = TextSecondary, fontSize = 12.sp)
+                Text(" Authorize outreach to 2 to 3 pilot institutions ($12/seat/yr).", color = TextSecondary, fontSize = 12.sp)
+                Text(" Agree on Phase gates (waitlist size & D-7 retention).", color = TextSecondary, fontSize = 12.sp)
             }
         }
     }
@@ -244,3 +244,4 @@ private fun RevenueDetails(
         }
     }
 }
+

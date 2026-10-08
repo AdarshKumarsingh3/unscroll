@@ -1,4 +1,4 @@
-package com.unscroll.app.ui.screens
+﻿package com.unscroll.app.ui.screens
 
 import android.content.Context
 import android.content.Intent
@@ -60,7 +60,7 @@ fun ReplacementsScreen(
                 .padding(horizontal = 14.dp, vertical = 6.dp)
         ) {
             Text(
-                text = "⚡ Section 5: Replacement Activity Library • 30 to 90s",
+                text = " Section 5: Replacement Activity Library  30 to 90s",
                 color = TealLight,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Medium
@@ -130,7 +130,7 @@ fun ReplacementsScreen(
                 BiteCard(
                     title = "Synthesized Rain Soundscape",
                     duration = "90s",
-                    desc = if (isRainPlaying) "● Rain sound is playing in background" else "Acoustic blanket to soothe overstimulated nerves.",
+                    desc = if (isRainPlaying) " Rain sound is playing in background" else "Acoustic blanket to soothe overstimulated nerves.",
                     actionLabel = if (isRainPlaying) "Stop Rain" else "Play Ambient Rain",
                     onLaunch = {
                         if (isRainPlaying) {
@@ -367,7 +367,7 @@ private fun TriviaModal(onDismiss: () -> Unit, onComplete: () -> Unit) {
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = if (answered) EmeraldAccent else CardDark)
                 ) {
-                    Text(if (answered) "✓ Dopamine (Seeking Molecule)" else "Dopamine", color = Color.White)
+                    Text(if (answered) " Dopamine (Seeking Molecule)" else "Dopamine", color = Color.White)
                 }
 
                 Button(
@@ -380,7 +380,7 @@ private fun TriviaModal(onDismiss: () -> Unit, onComplete: () -> Unit) {
 
                 if (answered) {
                     Text(
-                        text = "💡 Correct! Dopamine surges in anticipation of reward, not upon receiving it. Feeds exploit this seeking loop.",
+                        text = " Correct! Dopamine surges in anticipation of reward, not upon receiving it. Feeds exploit this seeking loop.",
                         color = TealLight,
                         fontSize = 12.sp
                     )
@@ -471,3 +471,4 @@ private fun sendFriendSms(context: Context) {
     } catch (_: Exception) {
     }
 }
+
