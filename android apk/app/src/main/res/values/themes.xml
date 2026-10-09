@@ -1,7 +1,7 @@
 <resources>
-    <style name="Theme.Unscroll" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:statusBarColor">#090D16</item>
-        <item name="android:navigationBarColor">#090D16</item>
-        <item name="android:windowBackground">#090D16</item>
+    <style name="Theme.Unscroll" parent="android:Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">@color/bg_dark</item>
+        <item name="android:navigationBarColor">@color/bg_dark</item>
+        <item name="android:windowBackground">@color/bg_dark</item>
     </style>
 </resources>

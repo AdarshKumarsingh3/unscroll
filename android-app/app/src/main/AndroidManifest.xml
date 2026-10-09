@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
-        android:name=".UnscrollApplication"
+        android:name="com.unscroll.app.UnscrollApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -16,7 +16,7 @@
 
         <!-- Main Activity -->
         <activity
-            android:name=".MainActivity"
+            android:name="com.unscroll.app.MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/Theme.Unscroll">
@@ -38,7 +38,7 @@
 
         <!-- Accessibility Service for detecting social feed opens & injecting 5s pause -->
         <service
-            android:name=".service.DoomscrollInterceptorService"
+            android:name="com.unscroll.app.service.DoomscrollInterceptorService"
             android:exported="true"
             android:label="@string/app_name"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
@@ -52,7 +52,7 @@
 
         <!-- Android Quick Settings Tile for Focus Mode -->
         <service
-            android:name=".service.QuickFocusTileService"
+            android:name="com.unscroll.app.service.QuickFocusTileService"
             android:exported="true"
             android:icon="@drawable/ic_notification"
             android:label="Focus Mode"
