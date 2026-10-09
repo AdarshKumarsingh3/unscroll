@@ -14,7 +14,7 @@ sealed class Screen(val route: String, val title: String, @DrawableRes val iconR
 
     companion object {
         // Primary 5 navigation bar items conforming to Material 3 standard
-        val bottomNavItems = listOf(
+        val bottomNavItems get() = listOf(
             Calculator,
             Interceptor,
             UrgeSurfer,
