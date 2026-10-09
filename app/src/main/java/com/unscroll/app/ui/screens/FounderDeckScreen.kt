@@ -1,4 +1,5 @@
-﻿package com.unscroll.app.ui.screens
+﻿import androidx.compose.foundation.shape.CircleShape
+package com.unscroll.app.ui.screens
 
 import android.content.Intent
 import android.net.Uri
@@ -123,8 +124,8 @@ fun FounderDeckScreen(
                     Text("Freemium SaaS", color = MaterialTheme.colorScheme.onSurface, fontSize = 20.sp, fontWeight = FontWeight.Black)
                     Text(
                         "• Free: Basic Interceptor, 1 Replacement\n" +
-                        "• \/mo: Advanced Analytics, All Replacements, Global Focus Rooms\n" +
-                        "• \/yr: Annual Subscription",
+                        "• \$5/mo: Advanced Analytics, All Replacements, Global Focus Rooms\n" +
+                        "• \$49/yr: Annual Subscription",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 15.sp,
                         lineHeight = 24.sp
@@ -183,3 +184,6 @@ private fun PillarItem(number: String, title: String, desc: String) {
         }
     }
 }
+
+
+

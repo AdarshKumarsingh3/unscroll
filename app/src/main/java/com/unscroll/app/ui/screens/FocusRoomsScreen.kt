@@ -64,13 +64,13 @@ fun FocusRoomsScreen(
 
     LaunchedEffect(isFocusing) {
         if (isFocusing) {
-            FocusNotificationManager.showFocusStickyNotification(context, minutesRemaining)
+            FocusNotificationManager.showOngoingFocusNotification(context, "${minutesRemaining}m", "Deep Work")
             while (minutesRemaining > 0 || secondsRemaining > 0) {
                 delay(1000)
                 if (secondsRemaining == 0) {
                     minutesRemaining--
                     secondsRemaining = 59
-                    FocusNotificationManager.showFocusStickyNotification(context, minutesRemaining)
+                    FocusNotificationManager.showOngoingFocusNotification(context, "${minutesRemaining}m", "Deep Work")
                 } else {
                     secondsRemaining--
                 }
@@ -80,7 +80,7 @@ fun FocusRoomsScreen(
                     HapticFeedback.triggerSuccess(context)
                     SoundSynthesizer.playSingingBowlChime(432f, 4.0f)
                     prefs.addReclaimedTime(25f / 60f)
-                    FocusNotificationManager.cancelStickyNotification(context)
+                    FocusNotificationManager.cancelFocusNotification(context)
                 }
             }
         }
@@ -154,7 +154,7 @@ fun FocusRoomsScreen(
                         isFocusing = !isFocusing
                         HapticFeedback.triggerClick(context)
                         if (!isFocusing) {
-                            FocusNotificationManager.cancelStickyNotification(context)
+                            FocusNotificationManager.cancelFocusNotification(context)
                         } else {
                             SoundSynthesizer.playSingingBowlChime(432f, 2f)
                         }
@@ -233,3 +233,4 @@ fun FocusRoomsScreen(
         }
     }
 }
+
