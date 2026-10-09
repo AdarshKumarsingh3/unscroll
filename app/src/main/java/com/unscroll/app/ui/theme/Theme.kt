@@ -1,30 +1,72 @@
-package com.unscroll.app.ui.theme
+﻿package com.unscroll.app.ui.theme
 
+import android.app.Activity
+import android.os.Build
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = TealBright,
-    onPrimary = BgDark,
-    secondary = EmeraldAccent,
-    onSecondary = BgDark,
-    tertiary = AmberAccent,
+    primary = TealPrimary,
+    secondary = TealBright,
+    tertiary = EmeraldAccent,
     background = BgDark,
     surface = SurfaceDark,
-    onBackground = TextPrimary,
-    onSurface = TextPrimary,
     surfaceVariant = CardDark,
-    onSurfaceVariant = TextSecondary,
-    outline = BorderDark
+    onPrimary = Color.White,
+    onSecondary = BgDark,
+    onTertiary = BgDark,
+    onBackground = TextPrimaryDark,
+    onSurface = TextPrimaryDark,
+    onSurfaceVariant = TextSecondaryDark,
+    outline = BorderDark,
+    error = RoseDanger
+)
+
+private val LightColorScheme = lightColorScheme(
+    primary = TealPrimary,
+    secondary = TealBright,
+    tertiary = EmeraldAccent,
+    background = BgLight,
+    surface = SurfaceLight,
+    surfaceVariant = CardLight,
+    onPrimary = Color.White,
+    onSecondary = Color.White,
+    onTertiary = Color.White,
+    onBackground = TextPrimaryLight,
+    onSurface = TextPrimaryLight,
+    onSurfaceVariant = TextSecondaryLight,
+    outline = BorderLight,
+    error = RoseDanger
 )
 
 @Composable
 fun UnscrollTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            window.statusBarColor = colorScheme.background.toArgb()
+            window.navigationBarColor = colorScheme.background.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = !darkTheme
+        }
+    }
+
     MaterialTheme(
-        colorScheme = DarkColorScheme,
+        colorScheme = colorScheme,
         typography = Typography,
         content = content
     )

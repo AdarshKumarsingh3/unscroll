@@ -2,6 +2,7 @@
 
 import android.content.Context
 import android.content.Intent
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -21,6 +22,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.unscroll.app.R
+import com.unscroll.app.ui.components.AnimatedPressCard
+import com.unscroll.app.ui.components.HapticFeedback
 import com.unscroll.app.ui.theme.*
 import java.util.Locale
 
@@ -42,11 +45,11 @@ fun CalculatorScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BgDark)
+            .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
-            .padding(16.dp),
+            .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         // Top Viral Badge
         Box(
@@ -54,38 +57,39 @@ fun CalculatorScreen(
                 .clip(RoundedCornerShape(50.dp))
                 .background(TealPrimary.copy(alpha = 0.15f))
                 .border(1.dp, TealPrimary.copy(alpha = 0.3f), RoundedCornerShape(50.dp))
-                .padding(horizontal = 12.dp, vertical = 6.dp)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
             Text(
-                text = " Top-of-Funnel Viral Engine  30%+ Share Rate",
-                color = TealLight,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Medium
+                text = "⚡ The Viral Cost Calculator",
+                color = TealBright,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold
             )
         }
 
         Text(
-            text = "Screen-Time Cost Calculator",
-            style = MaterialTheme.typography.headlineMedium,
-            color = Color.White
+            text = "Time is Zero-Sum",
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.onBackground
         )
 
         Text(
-            text = "See how many full 24-hour days you surrender to algorithms every year.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = TextSecondary
+            text = "See exactly how much life you surrender to algorithms every single year.",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
 
         // Interactive Card
         Card(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = SurfaceDark),
-            border = androidx.compose.foundation.BorderStroke(1.dp, BorderDark)
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
         ) {
             Column(
-                modifier = Modifier.padding(18.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                modifier = Modifier.padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -93,66 +97,83 @@ fun CalculatorScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Daily Feed Screen Time",
-                        color = Color.White,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold
+                        text = "Daily Screen Time",
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "${String.format(Locale.US, "%.1f", dailyHours)} hrs/day",
-                        color = TealLight,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
+                        text = " hrs",
+                        color = TealBright,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Black
                     )
                 }
 
                 Slider(
                     value = dailyHours,
-                    onValueChange = { dailyHours = it },
+                    onValueChange = { 
+                        dailyHours = it 
+                        HapticFeedback.triggerClick(context)
+                    },
                     valueRange = 0.5f..8.0f,
                     steps = 14,
                     colors = SliderDefaults.colors(
                         thumbColor = TealBright,
                         activeTrackColor = TealBright,
-                        inactiveTrackColor = BorderDark
+                        inactiveTrackColor = MaterialTheme.colorScheme.outline
                     )
                 )
 
                 // Impact Metrics Grid
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     MetricBox(
-                        title = "24h Days / Yr",
-                        value = "${String.format(Locale.US, "%.1f", fullDaysPerYear)} d",
-                        subtitle = "Full 24-hr days lost",
+                        title = "24h DAYS",
+                        value = " d",
+                        subtitle = "Full days lost / yr",
                         accentColor = RoseDanger,
                         modifier = Modifier.weight(1f)
                     )
                     MetricBox(
-                        title = "Waking Days",
-                        value = "${String.format(Locale.US, "%.1f", wakingDaysPerYear)} d",
-                        subtitle = "Equivalent 16h days",
+                        title = "WAKING DAYS",
+                        value = " d",
+                        subtitle = "16h days lost / yr",
                         accentColor = AmberAccent,
-                        modifier = Modifier.weight(1f)
-                    )
-                    MetricBox(
-                        title = "Over 30 Yrs",
-                        value = "${String.format(Locale.US, "%.1f", lifetime30Years)} yrs",
-                        subtitle = "Of pure life stolen",
-                        accentColor = PurpleAccent,
                         modifier = Modifier.weight(1f)
                     )
                 }
 
-                HorizontalDivider(color = BorderDark)
+                Box(
+                    modifier = Modifier.fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(PurpleAccent.copy(alpha=0.1f))
+                        .border(1.dp, PurpleAccent.copy(alpha=0.3f), RoundedCornerShape(12.dp))
+                        .padding(16.dp)
+                ) {
+                    Row(
+                        modifier=Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text("OVER 30 YEARS", color = PurpleAccent, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            Text("Of pure life stolen", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+                        }
+                        Text(" yrs", color = MaterialTheme.colorScheme.onSurface, fontSize = 28.sp, fontWeight = FontWeight.Black)
+                    }
+                }
+
+                HorizontalDivider(color = MaterialTheme.colorScheme.outline)
 
                 Text(
                     text = "WHAT THAT TIME COULD HAVE BOUGHT YOU:",
-                    color = TextTertiary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.sp
                 )
 
                 Row(
@@ -161,16 +182,16 @@ fun CalculatorScreen(
                 ) {
                     OpportunityItem(
                         iconRes = R.drawable.ic_nav_calculator,
-                        title = "$booksPerYear Books",
-                        subtitle = "Read cover to cover",
+                        title = " Books",
+                        subtitle = "Cover to cover",
                         color = EmeraldAccent,
                         modifier = Modifier.weight(1f)
                     )
                     OpportunityItem(
                         iconRes = R.drawable.ic_nav_replacements,
-                        title = "$workoutsPerYear Gym Sprints",
+                        title = " Workouts",
                         subtitle = "1-hour sessions",
-                        color = TealBright,
+                        color = BlueCalm,
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -178,51 +199,45 @@ fun CalculatorScreen(
         }
 
         // Share Card Preview with Android Share Intent
-        Card(
+        AnimatedPressCard(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = CardDark),
-            border = androidx.compose.foundation.BorderStroke(1.dp, TealPrimary.copy(alpha = 0.4f))
+            onClick = { shareScreenTimeReport(context, dailyHours, fullDaysPerYear, booksPerYear) },
+            playClickSound = true
         ) {
-            Column(
-                modifier = Modifier
-                    .background(
-                        Brush.verticalGradient(
-                            listOf(
-                                CardDark,
-                                TealPrimary.copy(alpha = 0.12f)
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                border = androidx.compose.foundation.BorderStroke(1.dp, TealPrimary.copy(alpha = 0.5f))
+            ) {
+                Column(
+                    modifier = Modifier
+                        .background(
+                            Brush.verticalGradient(
+                                listOf(
+                                    MaterialTheme.colorScheme.surfaceVariant,
+                                    TealPrimary.copy(alpha = 0.1f)
+                                )
                             )
                         )
-                    )
-                    .padding(18.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text(
-                    text = " SHAREABLE RESULT CARD",
-                    color = TealLight,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Text(
-                    text = "At ${String.format(Locale.US, "%.1f", dailyHours)}h/day, I lose ${String.format(Locale.US, "%.1f", fullDaysPerYear)} full days every year to doomscrolling. That's $booksPerYear books stolen by algorithms.",
-                    color = Color.White,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Medium,
-                    lineHeight = 22.sp
-                )
-
-                Button(
-                    onClick = {
-                        shareScreenTimeReport(context, dailyHours, fullDaysPerYear, booksPerYear)
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = TealPrimary)
+                        .padding(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Icon(painter = painterResource(R.drawable.ic_nav_pitch), contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Share Result to WhatsApp / Instagram", color = Color.White, fontWeight = FontWeight.Bold)
+                    Text(
+                        text = "📢 TAP TO SHARE THIS REALITY CHECK",
+                        color = TealBright,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.sp
+                    )
+
+                    Text(
+                        text = "At h/day, I lose  full days every year to doomscrolling. That's  books stolen by algorithms.",
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        lineHeight = 24.sp
+                    )
                 }
             }
         }
@@ -230,25 +245,25 @@ fun CalculatorScreen(
         // Quick CTAs
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             OutlinedButton(
                 onClick = onNavigateToUrgeSurfer,
-                modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = TealLight),
-                border = androidx.compose.foundation.BorderStroke(1.dp, TealPrimary)
+                modifier = Modifier.weight(1f).height(56.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = TealBright),
+                border = androidx.compose.foundation.BorderStroke(2.dp, TealPrimary)
             ) {
-                Text("Try 90s Urge Surfer")
+                Text("Try 90s Surfer", fontWeight = FontWeight.Bold)
             }
 
             Button(
                 onClick = onNavigateToReplacements,
-                modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = SurfaceDark)
+                modifier = Modifier.weight(1f).height(56.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
             ) {
-                Text("Browse Micro-Bites")
+                Text("Dopamine Bites", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
             }
         }
     }
@@ -264,15 +279,17 @@ private fun MetricBox(
 ) {
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(16.dp))
             .background(accentColor.copy(alpha = 0.1f))
-            .border(1.dp, accentColor.copy(alpha = 0.25f), RoundedCornerShape(12.dp))
-            .padding(10.dp)
+            .border(1.dp, accentColor.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
+            .padding(14.dp)
     ) {
         Column {
-            Text(title, color = accentColor, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
-            Text(value, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Text(subtitle, color = TextTertiary, fontSize = 9.sp, lineHeight = 11.sp)
+            Text(title, color = accentColor, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing=0.5.sp)
+            Spacer(modifier=Modifier.height(4.dp))
+            Text(value, color = MaterialTheme.colorScheme.onSurface, fontSize = 22.sp, fontWeight = FontWeight.Black)
+            Spacer(modifier=Modifier.height(2.dp))
+            Text(subtitle, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp, lineHeight = 14.sp)
         }
     }
 }
@@ -287,17 +304,17 @@ private fun OpportunityItem(
 ) {
     Row(
         modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(SurfaceDark)
-            .border(1.dp, BorderDark, RoundedCornerShape(12.dp))
-            .padding(10.dp),
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(16.dp))
+            .padding(14.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        Icon(painter = painterResource(iconRes), contentDescription = null, tint = color, modifier = Modifier.size(22.dp))
+        Icon(painter = painterResource(iconRes), contentDescription = null, tint = color, modifier = Modifier.size(24.dp))
         Column {
-            Text(title, color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-            Text(subtitle, color = TextTertiary, fontSize = 10.sp)
+            Text(title, color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            Text(subtitle, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
         }
     }
 }
@@ -308,7 +325,7 @@ private fun shareScreenTimeReport(context: Context, dailyHours: Float, daysLost:
             action = Intent.ACTION_SEND
             putExtra(
                 Intent.EXTRA_TEXT,
-                " I just audited my screen-time on Unscroll: At ${String.format(Locale.US, "%.1f", dailyHours)}h/day, I lose ${String.format(Locale.US, "%.1f", daysLost)} full 24-hr days every year to short-form feeds! That's $books books stolen. Reclaim your attention with Unscroll: The Anti-Doomscroll Habit OS."
+                "📱 I just audited my screen-time on Unscroll: At h/day, I lose  full 24-hr days every year to short-form feeds! That's  books stolen. Reclaim your attention with Unscroll: The Anti-Doomscroll Habit OS."
             )
             type = "text/plain"
         }
@@ -317,4 +334,3 @@ private fun shareScreenTimeReport(context: Context, dailyHours: Float, daysLost:
     } catch (_: Exception) {
     }
 }
-

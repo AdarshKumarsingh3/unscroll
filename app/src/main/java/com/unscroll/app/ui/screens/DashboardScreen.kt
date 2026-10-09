@@ -1,5 +1,6 @@
 ﻿package com.unscroll.app.ui.screens
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -20,6 +21,8 @@ import androidx.compose.ui.unit.sp
 import com.unscroll.app.R
 import com.unscroll.app.data.UnscrollPreferences
 import com.unscroll.app.service.FocusNotificationManager
+import com.unscroll.app.ui.components.AnimatedPressCard
+import com.unscroll.app.ui.components.HapticFeedback
 import com.unscroll.app.ui.theme.*
 import java.util.Locale
 
@@ -27,18 +30,29 @@ import java.util.Locale
 fun DashboardScreen() {
     val context = LocalContext.current
     val prefs = remember { UnscrollPreferences(context) }
+    
     var streak by remember { mutableIntStateOf(prefs.streakDays) }
     var hoursReclaimed by remember { mutableFloatStateOf(prefs.hoursReclaimed) }
     var urgesDefeated by remember { mutableIntStateOf(prefs.urgesDefeatedCount) }
 
+    // Intro animation state
+    var startAnimation by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { startAnimation = true }
+    
+    val animatedHours by animateFloatAsState(
+        targetValue = if (startAnimation) hoursReclaimed else 0f,
+        animationSpec = tween(1500, easing = FastOutSlowInEasing),
+        label = "hours"
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BgDark)
+            .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
-            .padding(16.dp),
+            .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         // Tag
         Box(
@@ -46,106 +60,100 @@ fun DashboardScreen() {
                 .clip(RoundedCornerShape(50.dp))
                 .background(TealPrimary.copy(alpha = 0.15f))
                 .border(1.dp, TealPrimary.copy(alpha = 0.3f), RoundedCornerShape(50.dp))
-                .padding(horizontal = 14.dp, vertical = 6.dp)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
             Text(
-                text = " Visible Progress & Dopamine Rewiring Engine",
-                color = TealLight,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Medium
+                text = "✨ Visible Progress Engine",
+                color = TealBright,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold
             )
         }
 
         Text(
-            text = "Saved-Hours Wall",
+            text = "Your Reclaimed Life",
             style = MaterialTheme.typography.headlineMedium,
-            color = Color.White
+            color = MaterialTheme.colorScheme.onBackground
         )
 
         // KPI Grid
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             KpiCard(
-                title = "HOURS RECLAIMED",
-                value = "${String.format(Locale.US, "%.1f", hoursReclaimed)}h",
-                subtitle = "Life redirected from feeds",
+                title = "HOURS SAVED",
+                value = "h",
+                subtitle = if (hoursReclaimed > 0) "Redirected from feeds" else "Start surfing urges!",
                 accentColor = TealBright,
                 modifier = Modifier.weight(1f)
             )
 
             KpiCard(
                 title = "ACTIVE STREAK",
-                value = "$streak d",
+                value = " d",
                 subtitle = "Shield protected",
                 accentColor = AmberAccent,
                 modifier = Modifier.weight(1f)
             )
         }
 
-        // Action Buttons Row
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        // Add 15 mins explicitly for testing dopamine hits
+        AnimatedPressCard(
+            onClick = {
+                prefs.addReclaimedTime(0.25f)
+                hoursReclaimed = prefs.hoursReclaimed
+                urgesDefeated = prefs.urgesDefeatedCount
+                streak = prefs.streakDays
+                HapticFeedback.triggerSuccess(context)
+                FocusNotificationManager.showStreakCelebration(context, streak, hoursReclaimed)
+            },
+            playClickSound = true,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Button(
-                onClick = {
-                    prefs.addReclaimedTime(0.25f)
-                    hoursReclaimed = prefs.hoursReclaimed
-                    urgesDefeated = prefs.urgesDefeatedCount
-                    FocusNotificationManager.showStreakCelebration(context, streak, hoursReclaimed)
-                },
-                modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = TealPrimary)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(TealPrimary)
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
             ) {
-                Icon(painter = painterResource(R.drawable.ic_nav_replacements), contentDescription = null, tint = Color.White, modifier = Modifier.size(16.dp))
-                Spacer(modifier = Modifier.width(4.dp))
-                Text("Log Urge (+15m)", fontSize = 11.sp, fontWeight = FontWeight.Bold)
-            }
-
-            OutlinedButton(
-                onClick = {
-                    FocusNotificationManager.showMindfulnessNudge(
-                        context,
-                        "Mindfulness Moment",
-                        "You have reclaimed ${String.format(Locale.US, "%.1f", hoursReclaimed)} hours! What will you create today?"
-                    )
-                },
-                modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(12.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, TealBright)
-            ) {
-                Icon(painter = painterResource(R.drawable.ic_notification), contentDescription = null, tint = TealBright, modifier = Modifier.size(16.dp))
-                Spacer(modifier = Modifier.width(4.dp))
-                Text("Test Nudge", color = TealLight, fontSize = 11.sp)
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(painter = painterResource(R.drawable.ic_nav_replacements), contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Manual Add: Surfed an Urge (+15m)", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                }
             }
         }
 
         // Dopamine Rewiring Milestones
         Card(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = SurfaceDark),
-            border = androidx.compose.foundation.BorderStroke(1.dp, BorderDark)
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
         ) {
             Column(
-                modifier = Modifier.padding(18.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                modifier = Modifier.padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = "DOPAMINE REWIRING ROADMAP",
-                    color = TextTertiary,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold
+                    text = "RECEPTOR REWIRING ROADMAP",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.sp
                 )
 
-                MilestoneItem("Day 1: Loop Awareness", "First unconscious open paused and redirected", true)
-                MilestoneItem("Day 3: Craving Peak Master", "Successfully rode 3 Urge Surfers", true)
-                MilestoneItem("Day 7: Dopamine Baseline Reset", "Brain receptors begin resensitizing", streak >= 7)
-                MilestoneItem("Day 14: Deep Flow Sovereign", "Prefrontal cortex default control restored", streak >= 14)
-                MilestoneItem("Day 30: Algorithm-Free Mind", "Zero automatic thumb compulsions", streak >= 30)
+                MilestoneItem("Day 1: Loop Awareness", "First unconscious open paused", streak >= 1)
+                MilestoneItem("Day 3: Craving Peak Master", "Riding the 90s wave", streak >= 3)
+                MilestoneItem("Day 7: Baseline Reset", "Receptors resensitizing", streak >= 7)
+                MilestoneItem("Day 14: Deep Flow", "Prefrontal cortex restored", streak >= 14)
+                MilestoneItem("Day 30: Algorithm-Free", "Zero automatic thumb compulsions", streak >= 30)
             }
         }
     }
@@ -161,17 +169,17 @@ private fun KpiCard(
 ) {
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(containerColor = SurfaceDark),
-        border = androidx.compose.foundation.BorderStroke(1.dp, accentColor.copy(alpha = 0.35f))
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = androidx.compose.foundation.BorderStroke(1.dp, accentColor.copy(alpha = 0.4f))
     ) {
         Column(
-            modifier = Modifier.padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            Text(title, color = accentColor, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-            Text(value, color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Black)
-            Text(subtitle, color = TextTertiary, fontSize = 10.sp)
+            Text(title, color = accentColor, fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.5.sp)
+            Text(value, color = MaterialTheme.colorScheme.onSurface, fontSize = 32.sp, fontWeight = FontWeight.Black)
+            Text(subtitle, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp, lineHeight = 14.sp)
         }
     }
 }
@@ -181,29 +189,28 @@ private fun MilestoneItem(title: String, desc: String, achieved: Boolean) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(if (achieved) CardDark else BgDark)
-            .border(1.dp, if (achieved) EmeraldAccent.copy(alpha = 0.3f) else BorderDark, RoundedCornerShape(12.dp))
-            .padding(10.dp),
+            .clip(RoundedCornerShape(16.dp))
+            .background(if (achieved) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.background)
+            .border(1.dp, if (achieved) EmeraldAccent.copy(alpha = 0.4f) else MaterialTheme.colorScheme.outline, RoundedCornerShape(16.dp))
+            .padding(14.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Box(
             modifier = Modifier
-                .size(24.dp)
-                .clip(RoundedCornerShape(6.dp))
-                .background(if (achieved) EmeraldAccent else BorderDark),
+                .size(28.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(if (achieved) EmeraldAccent else MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)),
             contentAlignment = Alignment.Center
         ) {
             if (achieved) {
-                Icon(painter = painterResource(R.drawable.ic_nav_interceptor), contentDescription = null, tint = BgDark, modifier = Modifier.size(16.dp))
+                Icon(painter = painterResource(R.drawable.ic_nav_interceptor), contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
             }
         }
 
         Column(modifier = Modifier.weight(1f)) {
-            Text(title, color = if (achieved) Color.White else TextTertiary, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-            Text(desc, color = TextSecondary, fontSize = 10.sp)
+            Text(title, color = if (achieved) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            Text(desc, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f), fontSize = 12.sp)
         }
     }
 }
-

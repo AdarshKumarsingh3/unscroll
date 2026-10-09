@@ -1,5 +1,7 @@
 ﻿package com.unscroll.app.ui.screens
 
+import android.content.Context
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -23,217 +25,211 @@ import com.unscroll.app.data.FocusPeer
 import com.unscroll.app.data.UnscrollPreferences
 import com.unscroll.app.service.FocusNotificationManager
 import com.unscroll.app.service.SoundSynthesizer
+import com.unscroll.app.ui.components.AnimatedPressCard
+import com.unscroll.app.ui.components.HapticFeedback
 import com.unscroll.app.ui.theme.*
 import kotlinx.coroutines.delay
 
 @Composable
-fun FocusRoomsScreen() {
+fun FocusRoomsScreen(
+    onNavigateBack: () -> Unit
+) {
     val context = LocalContext.current
     val prefs = remember { UnscrollPreferences(context) }
+    var isFocusing by remember { mutableStateOf(false) }
+    var minutesRemaining by remember { mutableIntStateOf(25) }
+    var secondsRemaining by remember { mutableIntStateOf(0) }
 
-    var isRunning by remember { mutableStateOf(false) }
-    var secondsLeft by remember { mutableIntStateOf(25 * 60) }
-    var userTask by remember { mutableStateOf("Deep flow block & habit rewiring") }
-    var cheersCount by remember { mutableIntStateOf(148) }
-
-    val formattedTime = remember(secondsLeft) {
-        val m = secondsLeft / 60
-        val s = secondsLeft % 60
-        "%02d:%02d".format(java.util.Locale.US, m, s)
-    }
-
+    // Dummy data for global peers
     val peers = remember {
         listOf(
-            FocusPeer("1", "Sarah K.", "", "Writing psychology thesis chapter", 18),
-            FocusPeer("2", "Marcus L.", "", "Mobile UI system refactor in Jetpack Compose", 22),
-            FocusPeer("3", "Priya N.", "", "Studying biochem metabolic pathways", 12),
-            FocusPeer("4", "Kenji T.", "", "Async Kotlin coroutines architecture", 24)
+            FocusPeer("1", "Elena", "🇪🇸", "Studying for Med Boards", 14),
+            FocusPeer("2", "Kenji", "🇯🇵", "Coding Frontend", 42),
+            FocusPeer("3", "Sarah", "🇺🇸", "Writing Chapter 3", 8),
+            FocusPeer("4", "David", "🇬🇧", "Deep Work", 112)
         )
     }
 
-    LaunchedEffect(isRunning, secondsLeft) {
-        if (isRunning && secondsLeft > 0) {
-            delay(1000)
-            secondsLeft--
+    // Timer pulse animation
+    val infiniteTransition = rememberInfiniteTransition(label = "pulse")
+    val alpha by infiniteTransition.animateFloat(
+        initialValue = 0.2f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "alpha"
+    )
 
-            // Update Android ongoing sticky notification
-            FocusNotificationManager.showOngoingFocusNotification(context, formattedTime, userTask)
+    LaunchedEffect(isFocusing) {
+        if (isFocusing) {
+            FocusNotificationManager.showFocusStickyNotification(context, minutesRemaining)
+            while (minutesRemaining > 0 || secondsRemaining > 0) {
+                delay(1000)
+                if (secondsRemaining == 0) {
+                    minutesRemaining--
+                    secondsRemaining = 59
+                    FocusNotificationManager.showFocusStickyNotification(context, minutesRemaining)
+                } else {
+                    secondsRemaining--
+                }
 
-            if (secondsLeft == 0) {
-                isRunning = false
-                prefs.addReclaimedTime(0.42f) // 25 mins
-                SoundSynthesizer.playSingingBowlChime(528f, 4f)
-                FocusNotificationManager.cancelFocusNotification(context)
-                FocusNotificationManager.showStreakCelebration(context, prefs.streakDays, prefs.hoursReclaimed)
+                if (minutesRemaining == 0 && secondsRemaining == 0) {
+                    isFocusing = false
+                    HapticFeedback.triggerSuccess(context)
+                    SoundSynthesizer.playSingingBowlChime(432f, 4.0f)
+                    prefs.addReclaimedTime(25f / 60f)
+                    FocusNotificationManager.cancelStickyNotification(context)
+                }
             }
-        } else if (!isRunning) {
-            FocusNotificationManager.cancelFocusNotification(context)
         }
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BgDark)
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        // Tag
-        Box(
+        // Top Bar
+        Row(
             modifier = Modifier
-                .clip(RoundedCornerShape(50.dp))
-                .background(TealPrimary.copy(alpha = 0.15f))
-                .border(1.dp, TealPrimary.copy(alpha = 0.3f), RoundedCornerShape(50.dp))
-                .padding(horizontal = 14.dp, vertical = 6.dp)
+                .fillMaxWidth()
+                .padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = " Global Room 01  318 Focusers Live",
-                color = TealLight,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Medium
-            )
+            IconButton(onClick = { 
+                HapticFeedback.triggerClick(context)
+                onNavigateBack() 
+            }) {
+                Icon(painter = painterResource(R.drawable.ic_nav_urge), contentDescription = "Back", tint = MaterialTheme.colorScheme.onBackground)
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Text("Global Focus Rooms", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
         }
 
-        // Timer Card
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = SurfaceDark),
-            border = androidx.compose.foundation.BorderStroke(1.dp, TealPrimary.copy(alpha = 0.3f))
+        // Timer Section
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .padding(horizontal = 20.dp),
+            contentAlignment = Alignment.Center
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Box(
+                    modifier = Modifier
+                        .size(280.dp)
+                        .clip(CircleShape)
+                        .border(
+                            4.dp,
+                            if (isFocusing) EmeraldAccent.copy(alpha = alpha) else MaterialTheme.colorScheme.outline,
+                            CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = String.format("%02d:%02d", minutesRemaining, secondsRemaining),
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontSize = 64.sp,
+                            fontWeight = FontWeight.Black
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        if (isFocusing) {
+                            Text(
+                                text = "Deep Work Active",
+                                color = EmeraldAccent,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(40.dp))
+
+                AnimatedPressCard(
+                    onClick = {
+                        isFocusing = !isFocusing
+                        HapticFeedback.triggerClick(context)
+                        if (!isFocusing) {
+                            FocusNotificationManager.cancelStickyNotification(context)
+                        } else {
+                            SoundSynthesizer.playSingingBowlChime(432f, 2f)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(64.dp)
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(if (isFocusing) RoseDanger else MaterialTheme.colorScheme.onBackground)
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = if (isFocusing) "ABORT MISSION" else "START 25m SPRINT",
+                            color = if (isFocusing) Color.White else MaterialTheme.colorScheme.background,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        )
+                    }
+                }
+            }
+        }
+
+        // Peers Section
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .background(
+                    MaterialTheme.colorScheme.surfaceVariant,
+                    RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
+                )
+                .padding(24.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                Box(modifier = Modifier.size(12.dp).clip(CircleShape).background(EmeraldAccent))
                 Text(
-                    text = "DEEP FLOW BLOCK",
-                    color = TealBright,
-                    fontSize = 11.sp,
+                    text = "1,204 PEERS FOCUSING RIGHT NOW",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp
                 )
-
-                // Circular Timer Display
-                Box(
-                    modifier = Modifier
-                        .size(170.dp)
-                        .clip(CircleShape)
-                        .background(CardDark)
-                        .border(3.dp, TealPrimary, CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = formattedTime,
-                        color = Color.White,
-                        fontSize = 42.sp,
-                        fontWeight = FontWeight.Black
-                    )
-                }
-
-                // Controls
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Button(
-                        onClick = {
-                            isRunning = !isRunning
-                            if (isRunning) {
-                                SoundSynthesizer.playSingingBowlChime(440f, 2f)
-                            }
-                        },
-                        shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = TealBright)
-                    ) {
-                        Icon(
-                            painter = painterResource(if (isRunning) R.drawable.ic_nav_focus else R.drawable.ic_nav_urge),
-                            contentDescription = null,
-                            tint = BgDark,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(if (isRunning) "Pause" else "Start 25m Focus", color = BgDark, fontWeight = FontWeight.Bold)
-                    }
-
-                    IconButton(
-                        onClick = {
-                            isRunning = false
-                            secondsLeft = 25 * 60
-                            FocusNotificationManager.cancelFocusNotification(context)
-                        }
-                    ) {
-                        Icon(painter = painterResource(R.drawable.ic_nav_focus), contentDescription = null, tint = TextSecondary, modifier = Modifier.size(20.dp))
-                    }
-
-                    IconButton(
-                        onClick = { cheersCount++ }
-                    ) {
-                        Icon(painter = painterResource(R.drawable.ic_nav_replacements), contentDescription = null, tint = RoseDanger, modifier = Modifier.size(20.dp))
-                    }
-                }
-
-                Text(
-                    text = "Notification shade displays real-time timer when phone is locked.",
-                    color = TextTertiary,
-                    fontSize = 10.sp
-                )
             }
-        }
+            
+            Spacer(modifier = Modifier.height(20.dp))
 
-        // Intention Card
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(18.dp),
-            colors = CardDefaults.cardColors(containerColor = SurfaceDark),
-            border = androidx.compose.foundation.BorderStroke(1.dp, BorderDark)
-        ) {
-            Column(
-                modifier = Modifier.padding(14.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text("YOUR COMMITTED INTENTION IN THIS ROOM:", color = TextTertiary, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                Text(userTask, color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Medium)
-            }
-        }
-
-        // Live Peers List
-        Text(
-            text = "PEERS FOCUSING ALONGSIDE YOU",
-            color = TextTertiary,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.align(Alignment.Start)
-        )
-
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(peers) { peer ->
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = CardDefaults.cardColors(containerColor = CardDark),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, BorderDark.copy(alpha = 0.5f))
-                ) {
+                items(peers) { peer ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(MaterialTheme.colorScheme.surface)
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(peer.flag, fontSize = 20.sp)
+                        Text(peer.flag, fontSize = 24.sp)
+                        Spacer(modifier = Modifier.width(16.dp))
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(peer.name, color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                            Text(peer.task, color = TextSecondary, fontSize = 11.sp)
+                            Text(peer.name, color = MaterialTheme.colorScheme.onSurface, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                            Text(peer.task, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
                         }
-                        Text("${peer.minutesActive}m", color = TealLight, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                        Text("m", color = EmeraldAccent, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }
         }
     }
 }
-

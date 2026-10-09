@@ -3,12 +3,11 @@
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -22,260 +21,187 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.unscroll.app.data.ReplacementActivity
 import com.unscroll.app.data.TriggerCategory
 import com.unscroll.app.data.UnscrollPreferences
+import com.unscroll.app.service.FocusNotificationManager
 import com.unscroll.app.service.SoundSynthesizer
+import com.unscroll.app.ui.components.AnimatedPressCard
+import com.unscroll.app.ui.components.HapticFeedback
 import com.unscroll.app.ui.theme.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun ReplacementsScreen(
-    onNavigateToFocus: () -> Unit
-) {
+fun ReplacementsScreen() {
     val context = LocalContext.current
     val prefs = remember { UnscrollPreferences(context) }
-    var selectedCategory by remember { mutableStateOf(TriggerCategory.BORED) }
+    var selectedCategory by remember { mutableStateOf<TriggerCategory?>(null) }
+    
+    var activeModal by remember { mutableStateOf<String?>(null) } // "REFLEX", "TRIVIA", "SQUATS", "MENTAL"
 
-    // Active interactive mini-activity modal
-    var activeModal by remember { mutableStateOf<String?>(null) }
+    val activities = remember {
+        listOf(
+            ReplacementActivity("1", "Reaction Time Test", TriggerCategory.BORED, "30s", "Wake up your nervous system with a reflex challenge.", "REFLEX"),
+            ReplacementActivity("2", "Neuroscience Trivia", TriggerCategory.LEARN, "20s", "Learn why feeds hijack your brain.", "TRIVIA"),
+            ReplacementActivity("3", "10 Rapid Squats", TriggerCategory.RESTLESS, "45s", "Flush cortisol, increase cerebral blood flow instantly.", "SQUATS"),
+            ReplacementActivity("4", "Text a Friend", TriggerCategory.LONELY, "1m", "Replace parasocial scrolling with genuine connection.", "SMS"),
+            ReplacementActivity("5", "Mental Model", TriggerCategory.STRESSED, "30s", "Read one powerful mental model to reframe your day.", "MENTAL")
+        )
+    }
 
-    // Audio soundscape state
-    var isRainPlaying by remember { mutableStateOf(SoundSynthesizer.isAmbientActive()) }
+    val filteredActivities = if (selectedCategory == null) activities else activities.filter { it.category == selectedCategory }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BgDark)
+            .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .padding(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        // Tag
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(50.dp))
-                .background(TealPrimary.copy(alpha = 0.15f))
-                .border(1.dp, TealPrimary.copy(alpha = 0.3f), RoundedCornerShape(50.dp))
-                .padding(horizontal = 14.dp, vertical = 6.dp)
+        // Hero
+        Text(
+            text = "Dopamine Bites",
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+
+        Text(
+            text = "30-second micro-activities that satisfy the craving for stimulation without trapping you in an endless loop.",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+        )
+
+        // Filters
+        androidx.compose.foundation.lazy.LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(
-                text = " Section 5: Replacement Activity Library  30 to 90s",
-                color = TealLight,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Medium
-            )
+            item {
+                FilterChip(
+                    selected = selectedCategory == null,
+                    onClick = { 
+                        HapticFeedback.triggerClick(context)
+                        selectedCategory = null 
+                    },
+                    label = { Text("All", fontWeight = FontWeight.Bold) },
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = TealPrimary,
+                        selectedLabelColor = Color.White
+                    )
+                )
+            }
+            items(TriggerCategory.values().size) { index ->
+                val category = TriggerCategory.values()[index]
+                FilterChip(
+                    selected = selectedCategory == category,
+                    onClick = { 
+                        HapticFeedback.triggerClick(context)
+                        selectedCategory = category 
+                    },
+                    label = { Text(" ", fontWeight = FontWeight.Bold) },
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = TealPrimary,
+                        selectedLabelColor = Color.White
+                    )
+                )
+            }
         }
 
-        Text(
-            text = "Micro-Replacement Bites",
-            style = MaterialTheme.typography.headlineMedium,
-            color = Color.White
-        )
-
-        Text(
-            text = "Doomscrolling is an unconscious attempt to fix boredom, anxiety, or fatigue. Choose what your body is actually asking for:",
-            style = MaterialTheme.typography.bodyMedium,
-            color = TextSecondary
-        )
-
-        // Emotion Categories Row
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            items(TriggerCategory.values()) { cat ->
-                val isSelected = selectedCategory == cat
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(if (isSelected) TealPrimary else SurfaceDark)
-                        .border(1.dp, if (isSelected) TealBright else BorderDark, RoundedCornerShape(16.dp))
-                        .clickable { selectedCategory = cat }
-                        .padding(horizontal = 14.dp, vertical = 10.dp)
+        // Cards
+        filteredActivities.forEach { activity ->
+            AnimatedPressCard(
+                onClick = {
+                    if (activity.actionType == "SMS") {
+                        sendFriendSms(context)
+                        prefs.addReclaimedTime(5f / 60f)
+                    } else {
+                        activeModal = activity.actionType
+                    }
+                },
+                playClickSound = true,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    Column(
+                        modifier = Modifier.padding(20.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text(cat.emoji, fontSize = 16.sp)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = " ",
+                                color = TealBright,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                letterSpacing = 1.sp
+                            )
+                            Text(
+                                text = activity.durationText,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
                         Text(
-                            text = cat.displayName,
-                            color = if (isSelected) Color.White else TextSecondary,
-                            fontSize = 12.sp,
-                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                            text = activity.title,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Black
+                        )
+
+                        Text(
+                            text = activity.description,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 14.sp
                         )
                     }
                 }
             }
         }
-
-        // Activities for Selected Category
-        when (selectedCategory) {
-            TriggerCategory.BORED -> {
-                BiteCard(
-                    title = "30s Reflex Sprint",
-                    duration = "30s",
-                    desc = "Test your neuro-reaction speed against dopamine sluggishness.",
-                    onLaunch = { activeModal = "reflex" }
-                )
-                BiteCard(
-                    title = "Daily Dopamine Trivia Bite",
-                    duration = "45s",
-                    desc = "A quick curiosity puzzle: How algorithms hijack the basal ganglia.",
-                    onLaunch = { activeModal = "trivia" }
-                )
-            }
-            TriggerCategory.STRESSED -> {
-                BiteCard(
-                    title = "Synthesized Rain Soundscape",
-                    duration = "90s",
-                    desc = if (isRainPlaying) " Rain sound is playing in background" else "Acoustic blanket to soothe overstimulated nerves.",
-                    actionLabel = if (isRainPlaying) "Stop Rain" else "Play Ambient Rain",
-                    onLaunch = {
-                        if (isRainPlaying) {
-                            SoundSynthesizer.stopAmbientRain()
-                            isRainPlaying = false
-                        } else {
-                            SoundSynthesizer.startAmbientRain()
-                            isRainPlaying = true
-                        }
-                    }
-                )
-            }
-            TriggerCategory.RESTLESS -> {
-                BiteCard(
-                    title = "10-Rep Physical Squat Reset",
-                    duration = "45s",
-                    desc = "Flush cortisol and pump oxygen into your prefrontal cortex.",
-                    onLaunch = { activeModal = "squats" }
-                )
-            }
-            TriggerCategory.LONELY -> {
-                BiteCard(
-                    title = "Text One Friend Spark",
-                    duration = "30s",
-                    desc = "Replace the parasocial feed illusion with real connection.",
-                    actionLabel = "Launch SMS / WhatsApp",
-                    onLaunch = {
-                        sendFriendSms(context)
-                        prefs.addReclaimedTime(0.1f)
-                    }
-                )
-            }
-            TriggerCategory.PRODUCTIVE -> {
-                BiteCard(
-                    title = "Single Priority Lock-In",
-                    duration = "60s",
-                    desc = "Write the 1 domino task that matters today and start 25m flow.",
-                    actionLabel = "Take to Focus Room",
-                    onLaunch = onNavigateToFocus
-                )
-            }
-            TriggerCategory.LEARN -> {
-                BiteCard(
-                    title = "60-Second Mental Model",
-                    duration = "60s",
-                    desc = "The Variable Reward Trap: Why unpredictable rewards hook pigeons and human thumbs.",
-                    onLaunch = { activeModal = "model" }
-                )
-            }
-        }
     }
 
-    // Interactive Modals
+    // Modals
+    val onCompleteModal = {
+        activeModal = null
+        prefs.addReclaimedTime(5f / 60f) // 5 mins saved
+        HapticFeedback.triggerSuccess(context)
+        FocusNotificationManager.showStreakCelebration(context, prefs.streakDays, prefs.hoursReclaimed)
+    }
+
     when (activeModal) {
-        "reflex" -> ReflexGameModal(
-            onDismiss = { activeModal = null },
-            onComplete = {
-                prefs.addReclaimedTime(0.1f)
-                activeModal = null
-            }
-        )
-        "trivia" -> TriviaModal(
-            onDismiss = { activeModal = null },
-            onComplete = {
-                prefs.addReclaimedTime(0.1f)
-                activeModal = null
-            }
-        )
-        "squats" -> SquatsModal(
-            onDismiss = { activeModal = null },
-            onComplete = {
-                prefs.addReclaimedTime(0.15f)
-                activeModal = null
-            }
-        )
-        "model" -> MentalModelModal(
-            onDismiss = { activeModal = null },
-            onComplete = {
-                prefs.addReclaimedTime(0.1f)
-                activeModal = null
-            }
-        )
+        "REFLEX" -> ReflexGameModal(onDismiss = { activeModal = null }, onComplete = onCompleteModal)
+        "TRIVIA" -> TriviaModal(onDismiss = { activeModal = null }, onComplete = onCompleteModal)
+        "SQUATS" -> SquatsModal(onDismiss = { activeModal = null }, onComplete = onCompleteModal)
+        "MENTAL" -> MentalModelModal(onDismiss = { activeModal = null }, onComplete = onCompleteModal)
     }
 }
 
-@Composable
-private fun BiteCard(
-    title: String,
-    duration: String,
-    desc: String,
-    actionLabel: String = "Launch Activity Now",
-    onLaunch: () -> Unit
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = SurfaceDark),
-        border = androidx.compose.foundation.BorderStroke(1.dp, BorderDark)
-    ) {
-        Column(
-            modifier = Modifier.padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = duration,
-                    color = TealBright,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text("MICRO-BITE", color = TextTertiary, fontSize = 10.sp)
-            }
-
-            Text(title, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-            Text(desc, color = TextSecondary, fontSize = 12.sp, lineHeight = 18.sp)
-
-            Button(
-                onClick = onLaunch,
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = CardDark)
-            ) {
-                Text(actionLabel, color = TealLight, fontWeight = FontWeight.Bold, fontSize = 12.sp)
-            }
-        }
-    }
-}
-
-// 1. Reflex Sprint Mini-Game Modal with Coroutine Safety
 @Composable
 private fun ReflexGameModal(onDismiss: () -> Unit, onComplete: () -> Unit) {
-    var gameState by remember { mutableStateOf("IDLE") } // IDLE, WAITING, READY, DONE
+    var gameState by remember { mutableStateOf("IDLE") }
     var reactionTimeMs by remember { mutableLongStateOf(0L) }
     var startTime by remember { mutableLongStateOf(0L) }
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = SurfaceDark,
-        shape = RoundedCornerShape(24.dp),
-        title = { Text("Reflex Reaction Test", color = Color.White) },
+        containerColor = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(32.dp),
+        title = { Text("Reflex Reaction Test", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold) },
         text = {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -285,22 +211,24 @@ private fun ReflexGameModal(onDismiss: () -> Unit, onComplete: () -> Unit) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(160.dp)
-                        .clip(RoundedCornerShape(16.dp))
+                        .height(200.dp)
+                        .clip(RoundedCornerShape(24.dp))
                         .background(
                             when (gameState) {
                                 "WAITING" -> RoseDanger
                                 "READY" -> EmeraldAccent
                                 "DONE" -> TealPrimary
-                                else -> CardDark
+                                else -> MaterialTheme.colorScheme.surfaceVariant
                             }
                         )
                         .clickable {
                             if (gameState == "WAITING") {
                                 gameState = "IDLE"
+                                HapticFeedback.triggerClick(context)
                             } else if (gameState == "READY") {
                                 reactionTimeMs = System.currentTimeMillis() - startTime
                                 gameState = "DONE"
+                                HapticFeedback.triggerSuccess(context)
                                 SoundSynthesizer.playSingingBowlChime(660f, 1f)
                             }
                         },
@@ -310,11 +238,11 @@ private fun ReflexGameModal(onDismiss: () -> Unit, onComplete: () -> Unit) {
                         text = when (gameState) {
                             "WAITING" -> "WAIT FOR GREEN..."
                             "READY" -> "TAP NOW!"
-                            "DONE" -> "${reactionTimeMs}ms (Super Sharp!)"
+                            "DONE" -> "ms (Super Sharp!)"
                             else -> "Tap Start below"
                         },
-                        color = Color.White,
-                        fontSize = 18.sp,
+                        color = if (gameState == "IDLE") MaterialTheme.colorScheme.onSurfaceVariant else Color.White,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Black
                     )
                 }
@@ -322,140 +250,164 @@ private fun ReflexGameModal(onDismiss: () -> Unit, onComplete: () -> Unit) {
                 if (gameState == "IDLE" || gameState == "DONE") {
                     Button(
                         onClick = {
+                            HapticFeedback.triggerClick(context)
                             gameState = "WAITING"
                             scope.launch {
                                 delay((1500L..3500L).random())
                                 startTime = System.currentTimeMillis()
                                 gameState = "READY"
+                                HapticFeedback.triggerClick(context) // Tiny buzz when it turns green
                             }
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = TealBright)
+                        modifier = Modifier.fillMaxWidth().height(56.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = TealPrimary)
                     ) {
-                        Text(if (gameState == "DONE") "Try Again" else "Start Test", color = BgDark)
+                        Text(if (gameState == "DONE") "Try Again" else "Start Test", color = Color.White, fontWeight = FontWeight.Bold)
                     }
                 }
             }
         },
         confirmButton = {
             TextButton(onClick = onComplete) {
-                Text("Finish (+5m Saved)", color = TealLight)
+                Text("Finish (+5m Saved)", color = TealBright, fontWeight = FontWeight.Bold)
             }
         }
     )
 }
 
-// 2. Trivia Modal
 @Composable
 private fun TriviaModal(onDismiss: () -> Unit, onComplete: () -> Unit) {
     var answered by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = SurfaceDark,
-        shape = RoundedCornerShape(24.dp),
-        title = { Text("Neuroscience Trivia Bite", color = Color.White) },
+        containerColor = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(32.dp),
+        title = { Text("Neuroscience Trivia Bite", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Text(
                     text = "Which neurotransmitter is responsible for craving and seeking, rather than the actual pleasure of satisfaction?",
-                    color = TextSecondary,
-                    fontSize = 13.sp
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 16.sp
                 )
 
                 Button(
-                    onClick = { answered = true },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = if (answered) EmeraldAccent else CardDark)
+                    onClick = { 
+                        answered = true 
+                        HapticFeedback.triggerClick(context)
+                        SoundSynthesizer.playSingingBowlChime(432f, 1f)
+                    },
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = if (answered) EmeraldAccent else MaterialTheme.colorScheme.surfaceVariant)
                 ) {
-                    Text(if (answered) " Dopamine (Seeking Molecule)" else "Dopamine", color = Color.White)
+                    Text(if (answered) " Dopamine (Seeking Molecule)" else "Dopamine", color = if (answered) Color.White else MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
                 }
 
                 Button(
-                    onClick = { answered = true },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = CardDark)
+                    onClick = { 
+                        answered = true 
+                        HapticFeedback.triggerClick(context)
+                        SoundSynthesizer.playSingingBowlChime(432f, 1f)
+                    },
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                 ) {
-                    Text("Serotonin (Contentment)", color = TextSecondary)
+                    Text("Serotonin (Contentment)", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
                 }
 
                 if (answered) {
                     Text(
                         text = " Correct! Dopamine surges in anticipation of reward, not upon receiving it. Feeds exploit this seeking loop.",
-                        color = TealLight,
-                        fontSize = 12.sp
+                        color = TealBright,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
         },
         confirmButton = {
             TextButton(onClick = onComplete) {
-                Text("Got It (+10m Saved)", color = TealLight)
+                Text("Got It (+5m Saved)", color = TealBright, fontWeight = FontWeight.Bold)
             }
         }
     )
 }
 
-// 3. Physical Squats Modal
 @Composable
 private fun SquatsModal(onDismiss: () -> Unit, onComplete: () -> Unit) {
     var reps by remember { mutableIntStateOf(0) }
+    val context = LocalContext.current
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = SurfaceDark,
-        shape = RoundedCornerShape(24.dp),
-        title = { Text("10-Rep Physical Reset", color = Color.White) },
+        containerColor = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(32.dp),
+        title = { Text("10-Rep Physical Reset", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold) },
         text = {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Stand up from your desk. Do 10 squats to restore cerebral blood flow.", color = TextSecondary, fontSize = 12.sp)
+                Text("Stand up. Do 10 squats to restore cerebral blood flow instantly.", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 16.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
 
-                Text("$reps / 10", color = TealLight, fontSize = 36.sp, fontWeight = FontWeight.Black)
+                Text(" / 10", color = TealBright, fontSize = 48.sp, fontWeight = FontWeight.Black)
 
                 Button(
-                    onClick = { if (reps < 10) reps++ },
+                    onClick = { 
+                        if (reps < 10) {
+                            reps++
+                            HapticFeedback.triggerClick(context)
+                        } 
+                    },
+                    modifier = Modifier.fillMaxWidth().height(64.dp),
+                    shape = RoundedCornerShape(20.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = TealPrimary)
                 ) {
-                    Text("Tap Per Rep (+1)", color = Color.White)
+                    Text("Tap Per Rep (+1)", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 }
             }
         },
         confirmButton = {
             TextButton(onClick = onComplete) {
-                Text("Finish (+10m Saved)", color = TealLight)
+                Text("Finish (+5m Saved)", color = TealBright, fontWeight = FontWeight.Bold)
             }
         }
     )
 }
 
-// 4. Mental Model Modal
 @Composable
 private fun MentalModelModal(onDismiss: () -> Unit, onComplete: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = SurfaceDark,
-        shape = RoundedCornerShape(24.dp),
-        title = { Text("The Variable Reward Trap", color = Color.White) },
+        containerColor = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(32.dp),
+        title = { Text("The Variable Reward Trap", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Text(
                     text = "A pigeon given a food pellet every time gets bored quickly. But a pigeon given food unpredictably pecks relentlessly until exhaustion.",
-                    color = TextSecondary,
-                    fontSize = 13.sp
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 16.sp,
+                    lineHeight = 24.sp
                 )
                 Text(
                     text = "Social feeds use the exact same slot-machine mechanic: 8 boring clips followed by 1 amazing clip turns your thumb into an obsessive lever.",
-                    color = TealLight,
-                    fontSize = 12.sp
+                    color = TealBright,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 24.sp
                 )
             }
         },
         confirmButton = {
             TextButton(onClick = onComplete) {
-                Text("Understood (+10m Saved)", color = TealLight)
+                Text("Understood (+5m Saved)", color = TealBright, fontWeight = FontWeight.Bold)
             }
         }
     )
@@ -471,4 +423,3 @@ private fun sendFriendSms(context: Context) {
     } catch (_: Exception) {
     }
 }
-

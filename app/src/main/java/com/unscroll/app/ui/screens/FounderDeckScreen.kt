@@ -1,5 +1,7 @@
 ﻿package com.unscroll.app.ui.screens
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -7,241 +9,177 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.unscroll.app.R
+import com.unscroll.app.ui.components.AnimatedPressCard
+import com.unscroll.app.ui.components.HapticFeedback
 import com.unscroll.app.ui.theme.*
 
 @Composable
-fun FounderDeckScreen() {
-    var selectedScenario by remember { mutableStateOf("BASE") }
+fun FounderDeckScreen(
+    onNavigateBack: () -> Unit
+) {
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BgDark)
+            .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Tag
+        // Hero Header
         Box(
             modifier = Modifier
-                .clip(RoundedCornerShape(50.dp))
-                .background(AmberAccent.copy(alpha = 0.15f))
-                .border(1.dp, AmberAccent.copy(alpha = 0.3f), RoundedCornerShape(50.dp))
-                .padding(horizontal = 14.dp, vertical = 6.dp)
+                .fillMaxWidth()
+                .background(
+                    Brush.verticalGradient(
+                        listOf(TealPrimary.copy(alpha=0.2f), MaterialTheme.colorScheme.background)
+                    )
+                )
+                .padding(top = 40.dp, start = 20.dp, end = 20.dp, bottom = 20.dp)
         ) {
-            Text(
-                text = " Prepared for the Founders & Executive Team",
-                color = AmberAccent,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold
+            Column {
+                IconButton(onClick = { 
+                    HapticFeedback.triggerClick(context)
+                    onNavigateBack() 
+                }, modifier = Modifier.offset(x = (-12).dp)) {
+                    Icon(painter = painterResource(R.drawable.ic_nav_urge), contentDescription = "Back", tint = MaterialTheme.colorScheme.onBackground)
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "UNSCROLL",
+                    color = TealPrimary,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Black,
+                    letterSpacing = 4.sp
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "The Anti-Doomscroll Habit OS",
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = "A systemic solution to short-form video addiction. Reclaiming 1 billion hours of human potential.",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
+        ) {
+            // Core Problem
+            PitchSection(
+                title = "THE PROBLEM",
+                content = "Social media companies spend billions optimizing algorithms to bypass the prefrontal cortex. Users don't want to scroll for 4 hours, they are neurologically hijacked."
             )
-        }
 
-        Text(
-            text = "90-Day Plan & Business Proposal",
-            style = MaterialTheme.typography.headlineMedium,
-            color = Color.White
-        )
+            // The Solution
+            PitchSection(
+                title = "THE SOLUTION",
+                content = "We insert friction precisely at the point of behavioral failure. By adding a 5-second mindfulness pause before feeds open, we re-engage the prefrontal cortex."
+            )
 
-        Text(
-            text = "Our defensible moat: Friction + Replacement + Community.",
-            style = MaterialTheme.typography.bodyMedium,
-            color = TextSecondary
-        )
-
-        // The 3-Pillar Architecture
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            PillarCard("1. Friction", "5s breath pause stops automatic loop", TealBright, Modifier.weight(1f))
-            PillarCard("2. Replace", "30-90s dopamine bites satisfy brain", AmberAccent, Modifier.weight(1f))
-            PillarCard("3. Social", "Focus rooms & streaks build moat", PurpleAccent, Modifier.weight(1f))
-        }
-
-        // 90-Day Execution Roadmap
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = SurfaceDark),
-            border = androidx.compose.foundation.BorderStroke(1.dp, BorderDark)
-        ) {
-            Column(
-                modifier = Modifier.padding(18.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+            // 3 Pillars
+            Card(
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Icon(painter = painterResource(R.drawable.ic_nav_dashboard), contentDescription = null, tint = TealBright, modifier = Modifier.size(18.dp))
-                    Text("THE 90-DAY EXECUTION MODEL", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Text("THE 3 PILLARS", color = TealBright, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                    
+                    PillarItem(number = "1", title = "Intercept", desc = "Accessibility service blocks unconscious app opens.")
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+                    PillarItem(number = "2", title = "Recalibrate", desc = "90-second Urge Surfer drops dopamine baseline.")
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+                    PillarItem(number = "3", title = "Replace", desc = "30-second micro-activities satisfy the craving.")
                 }
-
-                PhaseItem(
-                    phase = "Phase 1: Foundation (Days 130)",
-                    goal = "Viral Cost Calculator, Urge Surfer, landing page.",
-                    gate = "Gate: 500+ completions / waitlist signups."
-                )
-
-                PhaseItem(
-                    phase = "Phase 2: Retention Core (Days 3160)",
-                    goal = "Android Interceptor, 30+ activity bites, user dashboard.",
-                    gate = "Gate: Day-7 Retention  25%."
-                )
-
-                PhaseItem(
-                    phase = "Phase 3: Community & Scale (Days 6190)",
-                    goal = "Live Focus Rooms, Stripe/Play billing, 2-3 B2B pilots.",
-                    gate = "Gate: 5k-10k registered users, first paying subscribers."
-                )
             }
-        }
 
-        // Year 1 Revenue Scenarios
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = SurfaceDark),
-            border = androidx.compose.foundation.BorderStroke(1.dp, BorderDark)
-        ) {
-            Column(
-                modifier = Modifier.padding(18.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+            // Monetization
+            Card(
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                border = androidx.compose.foundation.BorderStroke(1.dp, TealPrimary.copy(alpha=0.3f))
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Icon(painter = painterResource(R.drawable.ic_nav_replacements), contentDescription = null, tint = AmberAccent, modifier = Modifier.size(18.dp))
-                    Text("YEAR 1 REVENUE MODELS", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Text("BUSINESS MODEL", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                    
+                    Text("Freemium SaaS", color = MaterialTheme.colorScheme.onSurface, fontSize = 20.sp, fontWeight = FontWeight.Black)
+                    Text(
+                        "• Free: Basic Interceptor, 1 Replacement\n" +
+                        "• \/mo: Advanced Analytics, All Replacements, Global Focus Rooms\n" +
+                        "• \/yr: Annual Subscription",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 15.sp,
+                        lineHeight = 24.sp
+                    )
                 }
+            }
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+            // CTA
+            AnimatedPressCard(
+                onClick = {
+                    try {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/AdarshKumarsingh3/unscroll"))
+                        context.startActivity(intent)
+                    } catch (_: Exception) {}
+                },
+                modifier = Modifier.fillMaxWidth().padding(bottom = 40.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(64.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(TealPrimary)
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    listOf("CONSERVATIVE", "BASE", "OPTIMISTIC").forEach { sc ->
-                        FilterChip(
-                            selected = selectedScenario == sc,
-                            onClick = { selectedScenario = sc },
-                            label = { Text(sc, fontSize = 10.sp) },
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = AmberAccent,
-                                selectedLabelColor = BgDark
-                            )
-                        )
-                    }
-                }
-
-                when (selectedScenario) {
-                    "CONSERVATIVE" -> RevenueDetails("50,000", "3%", "1,500", "$45,000", "$30,000", "$75,000")
-                    "BASE" -> RevenueDetails("150,000", "4%", "6,000", "$180,000", "$60,000", "$240,000")
-                    else -> RevenueDetails("400,000", "5%", "20,000", "$600,000", "$120,000", "$720,000")
+                    Text("Join the Waitlist / View Repo", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }
+    }
+}
 
-        // Decisions Needed from Founders
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = CardDark),
-            border = androidx.compose.foundation.BorderStroke(1.dp, TealPrimary.copy(alpha = 0.3f))
+@Composable
+private fun PitchSection(title: String, content: String) {
+    Column {
+        Text(title, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(content, color = MaterialTheme.colorScheme.onSurface, fontSize = 18.sp, lineHeight = 26.sp, fontWeight = FontWeight.Medium)
+    }
+}
+
+@Composable
+private fun PillarItem(number: String, title: String, desc: String) {
+    Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+        Box(
+            modifier = Modifier.size(32.dp).clip(CircleShape).background(TealPrimary.copy(alpha=0.2f)),
+            contentAlignment = Alignment.Center
         ) {
-            Column(
-                modifier = Modifier.padding(18.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Icon(painter = painterResource(R.drawable.ic_nav_pitch), contentDescription = null, tint = EmeraldAccent, modifier = Modifier.size(18.dp))
-                    Text("ACTION ITEMS NEEDED FROM FOUNDER", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                }
-
-                Text(" Approve 90-day plan and focus on doomscrolling first.", color = TextSecondary, fontSize = 12.sp)
-                Text(" Confirm budget, engineering team & weekly time commitment.", color = TextSecondary, fontSize = 12.sp)
-                Text(" Authorize outreach to 2 to 3 pilot institutions ($12/seat/yr).", color = TextSecondary, fontSize = 12.sp)
-                Text(" Agree on Phase gates (waitlist size & D-7 retention).", color = TextSecondary, fontSize = 12.sp)
-            }
+            Text(number, color = TealBright, fontWeight = FontWeight.Black)
         }
-    }
-}
-
-@Composable
-private fun PillarCard(title: String, desc: String, accent: Color, modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(SurfaceDark)
-            .border(1.dp, accent.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
-            .padding(10.dp)
-    ) {
         Column {
-            Text(title, color = accent, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-            Text(desc, color = TextSecondary, fontSize = 9.sp, lineHeight = 12.sp)
+            Text(title, color = MaterialTheme.colorScheme.onSurface, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(desc, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
         }
     }
 }
-
-@Composable
-private fun PhaseItem(phase: String, goal: String, gate: String) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(10.dp))
-            .background(CardDark)
-            .padding(10.dp),
-        verticalArrangement = Arrangement.spacedBy(2.dp)
-    ) {
-        Text(phase, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-        Text(goal, color = TextSecondary, fontSize = 11.sp)
-        Text(gate, color = TealLight, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
-    }
-}
-
-@Composable
-private fun RevenueDetails(
-    users: String,
-    conv: String,
-    subs: String,
-    subRev: String,
-    b2bRev: String,
-    total: String
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(CardDark)
-            .padding(12.dp),
-        verticalArrangement = Arrangement.spacedBy(6.dp)
-    ) {
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text("Registered Users:", color = TextSecondary, fontSize = 12.sp)
-            Text(users, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-        }
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text("Paid Conversion:", color = TextSecondary, fontSize = 12.sp)
-            Text("$conv ($subs subs)", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-        }
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text("B2C Subscription ARR:", color = TextSecondary, fontSize = 12.sp)
-            Text(subRev, color = AmberAccent, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-        }
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text("Institutional B2B ARR:", color = TextSecondary, fontSize = 12.sp)
-            Text(b2bRev, color = TealLight, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-        }
-        HorizontalDivider(color = BorderDark)
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text("TOTAL PROJECTED ARR:", color = EmeraldAccent, fontSize = 13.sp, fontWeight = FontWeight.Black)
-            Text(total, color = EmeraldAccent, fontSize = 16.sp, fontWeight = FontWeight.Black)
-        }
-    }
-}
-
