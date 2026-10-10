@@ -1,4 +1,4 @@
-﻿package com.unscroll.app.ui.screens
+package com.unscroll.app.ui.screens
 
 import android.content.Context
 import android.content.Intent
@@ -16,10 +16,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.unscroll.app.R
@@ -44,11 +47,21 @@ fun InterceptorScreen(
         mutableStateListOf(
             "Instagram" to true,
             "TikTok" to true,
-            "YouTube" to true,
+            "YouTube Shorts" to true,
             "X / Twitter" to true,
-            "Reddit" to true
+            "Reddit" to true,
+            "Snapchat" to false
         )
     }
+
+    // Shield pulse animation
+    val pulseTransition = rememberInfiniteTransition(label = "shieldPulse")
+    val shieldScale by pulseTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.06f,
+        animationSpec = infiniteRepeatable(tween(1800, easing = FastOutSlowInEasing), RepeatMode.Reverse),
+        label = "shieldScale"
+    )
 
     Column(
         modifier = Modifier
@@ -59,83 +72,141 @@ fun InterceptorScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        // Status Badge
+        // Shield status orb
         Box(
             modifier = Modifier
-                .clip(RoundedCornerShape(50.dp))
-                .background(if (isShieldActive) EmeraldAccent.copy(alpha = 0.15f) else RoseDanger.copy(alpha = 0.15f))
-                .border(
-                    1.dp,
-                    if (isShieldActive) EmeraldAccent.copy(alpha = 0.3f) else RoseDanger.copy(alpha = 0.3f),
-                    RoundedCornerShape(50.dp)
+                .size(90.dp)
+                .scale(if (isShieldActive) shieldScale else 1f)
+                .clip(CircleShape)
+                .background(
+                    Brush.radialGradient(
+                        if (isShieldActive)
+                            listOf(EmeraldAccent.copy(alpha = 0.25f), EmeraldAccent.copy(alpha = 0.05f), Color.Transparent)
+                        else
+                            listOf(RoseDanger.copy(alpha = 0.2f), RoseDanger.copy(alpha = 0.05f), Color.Transparent)
+                    )
                 )
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .border(
+                    3.dp,
+                    if (isShieldActive) EmeraldAccent else RoseDanger,
+                    CircleShape
+                ),
+            contentAlignment = Alignment.Center
         ) {
             Text(
-                text = if (isShieldActive) "🛡️ Active Interceptor Shield" else "⏸️ Shield Paused",
-                color = if (isShieldActive) EmeraldAccent else RoseDanger,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold
+                if (isShieldActive) "\uD83D\uDEE1\uFE0F" else "\u26A0\uFE0F",
+                fontSize = 36.sp
             )
         }
 
         Text(
-            text = "Reality Check",
+            text = "Reality Check Shield",
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onBackground
         )
 
         Text(
-            text = "Adds a 5-second mindfulness check when opening feeds to break the unconscious loop.",
+            text = "5-second mindfulness pause when opening feed apps. Breaks the unconscious loop.",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            textAlign = TextAlign.Center
         )
 
-        // Main Shield Toggle Card
+        // MAIN TOGGLE CARD
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+            colors = CardDefaults.cardColors(containerColor = Color.Transparent)
         ) {
-            Row(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(24.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = "Global Interceptor",
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
+                    .background(
+                        Brush.horizontalGradient(
+                            if (isShieldActive)
+                                listOf(EmeraldAccent.copy(alpha = 0.1f), TealPrimary.copy(alpha = 0.05f))
+                            else
+                                listOf(RoseDanger.copy(alpha = 0.1f), OrangeAccent.copy(alpha = 0.05f))
+                        )
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Monitors app window state events",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 14.sp
+                    .border(
+                        1.dp,
+                        if (isShieldActive) EmeraldAccent.copy(alpha = 0.3f) else RoseDanger.copy(alpha = 0.3f),
+                        RoundedCornerShape(24.dp)
+                    )
+                    .padding(24.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Global Interceptor",
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = if (isShieldActive) "Actively monitoring feed apps" else "Shield is paused",
+                            color = if (isShieldActive) EmeraldAccent else RoseDanger,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                    Switch(
+                        checked = isShieldActive,
+                        onCheckedChange = {
+                            HapticFeedback.triggerClick(context)
+                            isShieldActive = it
+                            prefs.interceptorActive = it
+                            if (it) SoundSynthesizer.playSuccessChime() else SoundSynthesizer.playWarning()
+                        },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = Color.White,
+                            checkedTrackColor = EmeraldAccent,
+                            uncheckedThumbColor = Color.White,
+                            uncheckedTrackColor = RoseDanger.copy(alpha = 0.5f)
+                        )
                     )
                 }
-                Switch(
-                    checked = isShieldActive,
-                    onCheckedChange = {
-                        HapticFeedback.triggerClick(context)
-                        isShieldActive = it
-                        prefs.interceptorActive = it
-                    },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = Color.White,
-                        checkedTrackColor = EmeraldAccent
-                    )
+            }
+        }
+
+        // Response time stats
+        val avgResp = prefs.avgResponseTimeMs
+        val fastResp = prefs.fastestResponseMs
+        val totalInt = prefs.totalInterceptions
+
+        if (totalInt > 0) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                ResponseStat(
+                    label = "TOTAL",
+                    value = "$totalInt",
+                    color = TealBright,
+                    modifier = Modifier.weight(1f)
+                )
+                ResponseStat(
+                    label = "AVG RESP",
+                    value = "${avgResp}ms",
+                    color = BlueCalm,
+                    modifier = Modifier.weight(1f)
+                )
+                ResponseStat(
+                    label = "BEST",
+                    value = "${fastResp}ms",
+                    color = EmeraldAccent,
+                    modifier = Modifier.weight(1f)
                 )
             }
         }
 
-        // Monitored Apps Checklist
+        // MONITORED APPS
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(24.dp),
@@ -144,11 +215,11 @@ fun InterceptorScreen(
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text(
-                    text = "TARGET FEED TRAPS",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    text = "\uD83C\uDFAF TARGET FEED TRAPS",
+                    color = PurpleAccent,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp
@@ -156,35 +227,53 @@ fun InterceptorScreen(
 
                 monitoredApps.forEachIndexed { index, (appName, enabled) ->
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(
+                                if (enabled)
+                                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                                else
+                                    Color.Transparent
+                            )
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(appName, color = MaterialTheme.colorScheme.onSurface, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-                        Checkbox(
+                        Text(
+                            appName,
+                            color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 16.sp,
+                            fontWeight = if (enabled) FontWeight.SemiBold else FontWeight.Normal
+                        )
+                        Switch(
                             checked = enabled,
-                            onCheckedChange = { 
+                            onCheckedChange = {
                                 HapticFeedback.triggerClick(context)
-                                monitoredApps[index] = appName to it 
+                                monitoredApps[index] = appName to it
                             },
-                            colors = CheckboxDefaults.colors(
-                                checkedColor = TealPrimary,
-                                uncheckedColor = MaterialTheme.colorScheme.outline
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = Color.White,
+                                checkedTrackColor = TealPrimary,
+                                uncheckedTrackColor = MaterialTheme.colorScheme.outline
                             )
                         )
                     }
                     if (index < monitoredApps.size - 1) {
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
+                        HorizontalDivider(
+                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        )
                     }
                 }
             }
         }
 
-        // Test Simulator Button
+        // SIMULATE BUTTON
         AnimatedPressCard(
             onClick = {
                 isSimulatingPause = true
-                SoundSynthesizer.playSingingBowlChime(432f, 2.5f)
+                SoundSynthesizer.playHeartbeat()
             },
             playClickSound = false,
             modifier = Modifier.fillMaxWidth()
@@ -194,25 +283,31 @@ fun InterceptorScreen(
                     .fillMaxWidth()
                     .height(64.dp)
                     .clip(RoundedCornerShape(20.dp))
-                    .background(EmeraldAccent)
+                    .background(
+                        Brush.horizontalGradient(listOf(GradientPurpleStart, GradientPurpleEnd))
+                    )
                     .padding(16.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(painter = painterResource(R.drawable.ic_nav_urge), contentDescription = null, tint = Color.White, modifier = Modifier.size(24.dp))
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text("Simulate Interception", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                }
+                Text(
+                    "\uD83D\uDD2C Simulate Interception",
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
+
+        Spacer(modifier = Modifier.height(20.dp))
     }
 
-    // Modal Simulation
+    // INTERCEPTION MODAL
     if (isSimulatingPause) {
         PauseScreenSimulationModal(
-            onDismiss = { 
+            prefs = prefs,
+            onDismiss = {
                 HapticFeedback.triggerClick(context)
-                isSimulatingPause = false 
+                isSimulatingPause = false
             },
             onNavigateToUrgeSurfer = {
                 HapticFeedback.triggerClick(context)
@@ -229,13 +324,33 @@ fun InterceptorScreen(
 }
 
 @Composable
+private fun ResponseStat(label: String, value: String, color: Color, modifier: Modifier) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(14.dp))
+            .background(color.copy(alpha = 0.08f))
+            .border(1.dp, color.copy(alpha = 0.2f), RoundedCornerShape(14.dp))
+            .padding(12.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(value, color = MaterialTheme.colorScheme.onSurface, fontSize = 16.sp, fontWeight = FontWeight.Black)
+            Text(label, color = color, fontSize = 9.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.5.sp)
+        }
+    }
+}
+
+@Composable
 private fun PauseScreenSimulationModal(
+    prefs: UnscrollPreferences,
     onDismiss: () -> Unit,
     onNavigateToUrgeSurfer: () -> Unit,
     onNavigateToReplacements: () -> Unit
 ) {
     var countdown by remember { mutableIntStateOf(5) }
-    var selectedTrigger by remember { mutableStateOf("Bored") }
+    var selectedTrigger by remember { mutableStateOf("") }
+    val startTime = remember { System.currentTimeMillis() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         while (countdown > 0) {
@@ -243,7 +358,11 @@ private fun PauseScreenSimulationModal(
             countdown--
         }
         if (countdown == 0) {
-            SoundSynthesizer.playSingingBowlChime(600f, 1f)
+            SoundSynthesizer.playSuccessChime()
+            HapticFeedback.triggerSuccess(context)
+            // Record response time
+            val elapsed = System.currentTimeMillis() - startTime
+            prefs.recordResponseTime(elapsed)
         }
     }
 
@@ -256,17 +375,20 @@ private fun PauseScreenSimulationModal(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth()
             ) {
+                // Countdown orb
                 Box(
                     modifier = Modifier
                         .size(80.dp)
                         .clip(CircleShape)
-                        .background(TealPrimary.copy(alpha = 0.1f))
+                        .background(
+                            if (countdown > 0) TealPrimary.copy(alpha = 0.1f) else EmeraldAccent.copy(alpha = 0.15f)
+                        )
                         .border(3.dp, if (countdown > 0) TealBright else EmeraldAccent, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = if (countdown > 0) "s" else "✓",
-                        color = MaterialTheme.colorScheme.onSurface,
+                        text = if (countdown > 0) "${countdown}s" else "\u2713",
+                        color = if (countdown > 0) MaterialTheme.colorScheme.onSurface else EmeraldAccent,
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Black
                     )
@@ -275,7 +397,7 @@ private fun PauseScreenSimulationModal(
                 Text(
                     text = "Is this conscious?",
                     color = MaterialTheme.colorScheme.onSurface,
-                    fontSize = 24.sp,
+                    fontSize = 22.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -283,7 +405,7 @@ private fun PauseScreenSimulationModal(
                     text = "You opened a social feed. Take one deep breath.",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 14.sp,
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    textAlign = TextAlign.Center,
                     lineHeight = 20.sp
                 )
             }
@@ -295,7 +417,7 @@ private fun PauseScreenSimulationModal(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "WHAT IS DRIVING THE CRAVING?",
+                    text = "WHAT'S DRIVING THE CRAVING?",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
@@ -306,11 +428,15 @@ private fun PauseScreenSimulationModal(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    listOf("Bored 🥱", "Stressed 😰", "Lonely 🪫").forEach { trigger ->
+                    listOf("\uD83E\uDD71 Bored", "\uD83D\uDE30 Stress", "\uD83E\uDEAB Lonely").forEach { trigger ->
                         FilterChip(
                             selected = selectedTrigger == trigger,
-                            onClick = { selectedTrigger = trigger },
-                            label = { Text(trigger, fontSize = 12.sp, fontWeight = FontWeight.Bold) },
+                            onClick = {
+                                selectedTrigger = trigger
+                                HapticFeedback.triggerClick(context)
+                                SoundSynthesizer.playTick()
+                            },
+                            label = { Text(trigger, fontSize = 11.sp, fontWeight = FontWeight.Bold) },
                             colors = FilterChipDefaults.filterChipColors(
                                 selectedContainerColor = TealPrimary,
                                 selectedLabelColor = Color.White
@@ -318,31 +444,46 @@ private fun PauseScreenSimulationModal(
                         )
                     }
                 }
-                
-                Spacer(modifier=Modifier.height(8.dp))
+
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Button(
-                    onClick = onNavigateToUrgeSurfer,
-                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    onClick = {
+                        SoundSynthesizer.playWhoosh()
+                        onNavigateToUrgeSurfer()
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
                     shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = TealPrimary)
+                    colors = ButtonDefaults.buttonColors(containerColor = IndigoAccent)
                 ) {
-                    Text("🌊 Ride 90s Urge Surfer", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text("\uD83C\uDF0A Ride 90s Urge Surfer", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp)
                 }
 
                 OutlinedButton(
-                    onClick = onNavigateToReplacements,
-                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    onClick = {
+                        SoundSynthesizer.playWhoosh()
+                        onNavigateToReplacements()
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
                     shape = RoundedCornerShape(16.dp),
-                    border = androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.outline)
+                    border = androidx.compose.foundation.BorderStroke(2.dp, PurpleAccent.copy(alpha = 0.5f))
                 ) {
-                    Text("✨ Play 30s Dopamine Bite", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
+                    Text("\u2728 Play 30s Dopamine Bite", color = PurpleAccent, fontWeight = FontWeight.Bold)
                 }
             }
         },
         confirmButton = {
             TextButton(onClick = onDismiss, enabled = countdown == 0) {
-                Text(if (countdown > 0) "Wait..." else "Continue for 5m budget", color = if (countdown > 0) MaterialTheme.colorScheme.onSurfaceVariant else AmberAccent, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    if (countdown > 0) "Wait ${countdown}s..." else "Continue (5m budget)",
+                    color = if (countdown > 0) MaterialTheme.colorScheme.onSurfaceVariant else AmberAccent,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     )

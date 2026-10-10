@@ -11,15 +11,15 @@ sealed class Screen(val route: String, val title: String, @DrawableRes val iconR
     object FocusRooms : Screen("focus_rooms", "Focus", R.drawable.ic_nav_focus)
     object Dashboard : Screen("dashboard", "Saved", R.drawable.ic_nav_dashboard)
     object FounderDeck : Screen("founder_deck", "Pitch", R.drawable.ic_nav_pitch)
+    object MindfulTap : Screen("mindful_tap", "Zen Tap", R.drawable.ic_nav_focus)
 
     companion object {
-        // Primary 5 navigation bar items conforming to Material 3 standard
         val bottomNavItems get() = listOf(
+            Dashboard,
             Calculator,
             Interceptor,
             UrgeSurfer,
-            Replacements,
-            Dashboard
+            Replacements
         )
     }
 }

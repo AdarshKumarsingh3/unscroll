@@ -1,4 +1,4 @@
-﻿package com.unscroll.app.ui.screens
+package com.unscroll.app.ui.screens
 
 import android.content.Context
 import androidx.compose.animation.core.*
@@ -14,10 +14,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.unscroll.app.R
@@ -39,27 +42,38 @@ fun FocusRoomsScreen(
     var isFocusing by remember { mutableStateOf(false) }
     var minutesRemaining by remember { mutableIntStateOf(25) }
     var secondsRemaining by remember { mutableIntStateOf(0) }
+    var isRainPlaying by remember { mutableStateOf(false) }
 
-    // Dummy data for global peers
     val peers = remember {
         listOf(
-            FocusPeer("1", "Elena", "🇪🇸", "Studying for Med Boards", 14),
-            FocusPeer("2", "Kenji", "🇯🇵", "Coding Frontend", 42),
-            FocusPeer("3", "Sarah", "🇺🇸", "Writing Chapter 3", 8),
-            FocusPeer("4", "David", "🇬🇧", "Deep Work", 112)
+            FocusPeer("1", "Elena", "\uD83C\uDDEA\uD83C\uDDF8", "Studying for Med Boards", 14),
+            FocusPeer("2", "Kenji", "\uD83C\uDDEF\uD83C\uDDF5", "Coding Frontend", 42),
+            FocusPeer("3", "Sarah", "\uD83C\uDDFA\uD83C\uDDF8", "Writing Chapter 3", 8),
+            FocusPeer("4", "David", "\uD83C\uDDEC\uD83C\uDDE7", "Deep Work Sprint", 112),
+            FocusPeer("5", "Priya", "\uD83C\uDDEE\uD83C\uDDF3", "Research Paper", 67),
+            FocusPeer("6", "Lucas", "\uD83C\uDDE7\uD83C\uDDF7", "Piano Practice", 23)
         )
     }
 
-    // Timer pulse animation
-    val infiniteTransition = rememberInfiniteTransition(label = "pulse")
-    val alpha by infiniteTransition.animateFloat(
-        initialValue = 0.2f,
+    // Timer ring pulse
+    val pulseTransition = rememberInfiniteTransition(label = "timerPulse")
+    val ringAlpha by pulseTransition.animateFloat(
+        initialValue = 0.3f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(1000, easing = FastOutSlowInEasing),
+            animation = tween(1200, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
-        label = "alpha"
+        label = "ringAlpha"
+    )
+    val ringScale by pulseTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.04f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "ringScale"
     )
 
     LaunchedEffect(isFocusing) {
@@ -78,9 +92,15 @@ fun FocusRoomsScreen(
                 if (minutesRemaining == 0 && secondsRemaining == 0) {
                     isFocusing = false
                     HapticFeedback.triggerSuccess(context)
-                    SoundSynthesizer.playSingingBowlChime(432f, 4.0f)
+                    SoundSynthesizer.playLevelUp()
                     prefs.addReclaimedTime(25f / 60f)
+                    val best = prefs.longestFocusMinutes
+                    if (25 > best) prefs.longestFocusMinutes = 25
                     FocusNotificationManager.cancelFocusNotification(context)
+                    if (isRainPlaying) {
+                        SoundSynthesizer.stopAmbientRain()
+                        isRainPlaying = false
+                    }
                 }
             }
         }
@@ -91,7 +111,7 @@ fun FocusRoomsScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        // Top Bar
+        // Top bar
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -100,15 +120,22 @@ fun FocusRoomsScreen(
         ) {
             IconButton(onClick = { 
                 HapticFeedback.triggerClick(context)
-                onNavigateBack() 
+                if (isRainPlaying) {
+                    SoundSynthesizer.stopAmbientRain()
+                    isRainPlaying = false
+                }
+                onNavigateBack()
             }) {
                 Icon(painter = painterResource(R.drawable.ic_nav_urge), contentDescription = "Back", tint = MaterialTheme.colorScheme.onBackground)
             }
-            Spacer(modifier = Modifier.width(16.dp))
-            Text("Global Focus Rooms", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                Text("Global Focus Rooms", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onBackground)
+                Text("Co-work with humans worldwide", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
         }
 
-        // Timer Section
+        // Timer section
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -117,13 +144,23 @@ fun FocusRoomsScreen(
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                // Outer glow ring
                 Box(
                     modifier = Modifier
-                        .size(280.dp)
+                        .size(260.dp)
+                        .scale(if (isFocusing) ringScale else 1f)
                         .clip(CircleShape)
+                        .background(
+                            Brush.radialGradient(
+                                if (isFocusing)
+                                    listOf(EmeraldAccent.copy(alpha = 0.08f), Color.Transparent)
+                                else
+                                    listOf(Color.Transparent, Color.Transparent)
+                            )
+                        )
                         .border(
                             4.dp,
-                            if (isFocusing) EmeraldAccent.copy(alpha = alpha) else MaterialTheme.colorScheme.outline,
+                            if (isFocusing) EmeraldAccent.copy(alpha = ringAlpha) else MaterialTheme.colorScheme.outline,
                             CircleShape
                         ),
                     contentAlignment = Alignment.Center
@@ -132,62 +169,107 @@ fun FocusRoomsScreen(
                         Text(
                             text = String.format("%02d:%02d", minutesRemaining, secondsRemaining),
                             color = MaterialTheme.colorScheme.onBackground,
-                            fontSize = 64.sp,
+                            fontSize = 56.sp,
                             fontWeight = FontWeight.Black
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         if (isFocusing) {
                             Text(
-                                text = "Deep Work Active",
+                                text = "\uD83D\uDFE2 Deep Work Active",
                                 color = EmeraldAccent,
-                                fontSize = 16.sp,
+                                fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold
+                            )
+                        } else {
+                            Text(
+                                text = "25-Minute Sprint",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontSize = 14.sp
                             )
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(40.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-                AnimatedPressCard(
-                    onClick = {
-                        isFocusing = !isFocusing
-                        HapticFeedback.triggerClick(context)
-                        if (!isFocusing) {
-                            FocusNotificationManager.cancelFocusNotification(context)
-                        } else {
-                            SoundSynthesizer.playSingingBowlChime(432f, 2f)
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth()
+                // Controls row
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Box(
+                    // Rain toggle
+                    OutlinedButton(
+                        onClick = {
+                            HapticFeedback.triggerClick(context)
+                            if (isRainPlaying) {
+                                SoundSynthesizer.stopAmbientRain()
+                                isRainPlaying = false
+                            } else {
+                                SoundSynthesizer.startAmbientRain()
+                                isRainPlaying = true
+                            }
+                        },
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(64.dp)
-                            .clip(RoundedCornerShape(20.dp))
-                            .background(if (isFocusing) RoseDanger else MaterialTheme.colorScheme.onBackground)
-                            .padding(16.dp),
-                        contentAlignment = Alignment.Center
+                            .weight(1f)
+                            .height(56.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        border = androidx.compose.foundation.BorderStroke(
+                            1.dp,
+                            if (isRainPlaying) CyanAccent else MaterialTheme.colorScheme.outline
+                        )
                     ) {
                         Text(
-                            text = if (isFocusing) "ABORT MISSION" else "START 25m SPRINT",
-                            color = if (isFocusing) Color.White else MaterialTheme.colorScheme.background,
+                            if (isRainPlaying) "\uD83C\uDF27\uFE0F Rain On" else "\uD83C\uDF27\uFE0F Rain",
+                            color = if (isRainPlaying) CyanAccent else MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    // Focus start/stop
+                    Button(
+                        onClick = {
+                            isFocusing = !isFocusing
+                            HapticFeedback.triggerClick(context)
+                            if (!isFocusing) {
+                                FocusNotificationManager.cancelFocusNotification(context)
+                                SoundSynthesizer.playWarning()
+                            } else {
+                                minutesRemaining = 25
+                                secondsRemaining = 0
+                                SoundSynthesizer.playSingingBowlChime(432f, 2.5f)
+                            }
+                        },
+                        modifier = Modifier
+                            .weight(2f)
+                            .height(56.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (isFocusing) RoseDanger else EmeraldAccent
+                        )
+                    ) {
+                        Text(
+                            if (isFocusing) "\u23F9 End Session" else "\u25B6\uFE0F Start Sprint",
+                            color = Color.White,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp
+                            fontSize = 16.sp
                         )
                     }
                 }
             }
         }
 
-        // Peers Section
+        // Peers section
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
                 .background(
-                    MaterialTheme.colorScheme.surfaceVariant,
+                    Brush.verticalGradient(
+                        listOf(
+                            MaterialTheme.colorScheme.surfaceVariant,
+                            MaterialTheme.colorScheme.surfaceVariant
+                        )
+                    ),
                     RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
                 )
                 .padding(24.dp)
@@ -196,20 +278,33 @@ fun FocusRoomsScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Box(modifier = Modifier.size(12.dp).clip(CircleShape).background(EmeraldAccent))
+                // Animated green dot
+                val dotPulse = rememberInfiniteTransition(label = "dot")
+                val dotScale by dotPulse.animateFloat(
+                    initialValue = 0.8f, targetValue = 1.2f,
+                    animationSpec = infiniteRepeatable(tween(1000), RepeatMode.Reverse),
+                    label = "dotScale"
+                )
+                Box(
+                    modifier = Modifier
+                        .size(10.dp)
+                        .scale(dotScale)
+                        .clip(CircleShape)
+                        .background(EmeraldAccent)
+                )
                 Text(
-                    text = "1,204 PEERS FOCUSING RIGHT NOW",
+                    text = "1,204 PEERS FOCUSING NOW",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 12.sp,
+                    fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp
                 )
             }
             
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 items(peers) { peer ->
                     Row(
@@ -217,20 +312,27 @@ fun FocusRoomsScreen(
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(16.dp))
                             .background(MaterialTheme.colorScheme.surface)
-                            .padding(16.dp),
+                            .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
+                            .padding(14.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(peer.flag, fontSize = 24.sp)
-                        Spacer(modifier = Modifier.width(16.dp))
+                        Spacer(modifier = Modifier.width(14.dp))
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(peer.name, color = MaterialTheme.colorScheme.onSurface, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                            Text(peer.task, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
+                            Text(peer.name, color = MaterialTheme.colorScheme.onSurface, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                            Text(peer.task, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 13.sp)
                         }
-                        Text("m", color = EmeraldAccent, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(EmeraldAccent.copy(alpha = 0.1f))
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                        ) {
+                            Text("${peer.minutesActive}m", color = EmeraldAccent, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                        }
                     }
                 }
             }
         }
     }
 }
-

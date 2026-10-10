@@ -1,4 +1,4 @@
-﻿package com.unscroll.app.ui.screens
+package com.unscroll.app.ui.screens
 
 import android.content.Context
 import androidx.compose.animation.animateColorAsState
@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.unscroll.app.R
@@ -45,28 +46,37 @@ fun UrgeSurferScreen(
     var phaseSeconds by remember { mutableIntStateOf(4) }
     var tapsCount by remember { mutableIntStateOf(0) }
     var isFinished by remember { mutableStateOf(false) }
-    var initialCraving by remember { mutableFloatStateOf(8f) }
 
-    // Smooth Breathing Animation
+    // Smooth breathing
     val infiniteTransition = rememberInfiniteTransition(label = "breathe")
     val breathScale by infiniteTransition.animateFloat(
-        initialValue = 0.8f,
-        targetValue = 1.3f,
+        initialValue = 0.75f,
+        targetValue = 1.35f,
         animationSpec = infiniteRepeatable(
             animation = tween(4000, easing = LinearOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "scale"
     )
-    
+
     val orbColor by animateColorAsState(
         targetValue = when (breathPhase) {
-            "Inhale" -> TealPrimary
-            "Hold" -> BlueCalm
+            "Inhale" -> CyanAccent
+            "Hold" -> IndigoAccent
             "Exhale" -> EmeraldAccent
             else -> TealPrimary
         },
-        animationSpec = tween(1000), label = "orbColor"
+        animationSpec = tween(800), label = "orbColor"
+    )
+
+    val orbColor2 by animateColorAsState(
+        targetValue = when (breathPhase) {
+            "Inhale" -> BlueCalm
+            "Hold" -> PurpleDeep
+            "Exhale" -> TealBright
+            else -> TealBright
+        },
+        animationSpec = tween(800), label = "orbColor2"
     )
 
     LaunchedEffect(isRunning, secondsRemaining) {
@@ -85,14 +95,16 @@ fun UrgeSurferScreen(
                     else -> "Inhale"
                 }
                 SoundSynthesizer.playSingingBowlChime(432f, 1.2f)
+                HapticFeedback.triggerClick(context)
             }
 
             if (secondsRemaining == 0) {
                 isRunning = false
                 isFinished = true
                 prefs.addReclaimedTime(0.25f)
+                prefs.recordBreathSession()
                 HapticFeedback.triggerSuccess(context)
-                SoundSynthesizer.playSingingBowlChime(528f, 3.5f)
+                SoundSynthesizer.playLevelUp()
                 FocusNotificationManager.showStreakCelebration(context, prefs.streakDays, prefs.hoursReclaimed)
             }
         }
@@ -111,13 +123,15 @@ fun UrgeSurferScreen(
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(50.dp))
-                .background(BlueCalm.copy(alpha = 0.15f))
-                .border(1.dp, BlueCalm.copy(alpha = 0.3f), RoundedCornerShape(50.dp))
+                .background(
+                    Brush.horizontalGradient(listOf(IndigoAccent.copy(alpha = 0.15f), CyanAccent.copy(alpha = 0.15f)))
+                )
+                .border(1.dp, IndigoAccent.copy(alpha = 0.3f), RoundedCornerShape(50.dp))
                 .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
             Text(
-                text = "🧠 Craving Wave Protocol • 90s",
-                color = BlueCalm,
+                text = "\uD83E\uDDE0 Craving Wave Protocol \u2022 90s",
+                color = IndigoAccent,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -130,15 +144,17 @@ fun UrgeSurferScreen(
         )
 
         Text(
-            text = "Dopamine cravings peak for 60-90s. Ride the wave instead of scrolling. Watch it collapse.",
+            text = "Dopamine cravings peak for 60-90s. Ride the wave. Watch it collapse.",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            textAlign = TextAlign.Center
         )
 
-        // Main Breathing Stage Card
+        // MAIN BREATHING STAGE
         Card(
-            modifier = Modifier.fillMaxWidth().height(360.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(380.dp),
             shape = RoundedCornerShape(32.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
@@ -148,26 +164,49 @@ fun UrgeSurferScreen(
                 contentAlignment = Alignment.Center
             ) {
                 if (!isFinished) {
-                    // Tactile Breathing Orb
+                    // Outer glow ring
+                    if (isRunning) {
+                        Box(
+                            modifier = Modifier
+                                .size(280.dp)
+                                .scale(breathScale * 1.05f)
+                                .clip(CircleShape)
+                                .background(
+                                    Brush.radialGradient(
+                                        listOf(
+                                            orbColor.copy(alpha = 0.08f),
+                                            Color.Transparent
+                                        )
+                                    )
+                                )
+                        )
+                    }
+
+                    // Main breathing orb
                     Box(
                         modifier = Modifier
-                            .size(240.dp)
+                            .size(220.dp)
                             .scale(if (isRunning) breathScale else 1f)
                             .clip(CircleShape)
                             .background(
                                 Brush.radialGradient(
                                     listOf(
-                                        orbColor.copy(alpha = 0.3f),
-                                        orbColor.copy(alpha = 0.1f),
+                                        orbColor.copy(alpha = 0.25f),
+                                        orbColor2.copy(alpha = 0.1f),
                                         Color.Transparent
                                     )
                                 )
                             )
-                            .border(3.dp, orbColor.copy(alpha = 0.5f), CircleShape)
+                            .border(
+                                3.dp,
+                                Brush.linearGradient(listOf(orbColor, orbColor2)),
+                                CircleShape
+                            )
                             .clickable {
                                 if (isRunning) {
                                     tapsCount++
                                     HapticFeedback.triggerClick(context)
+                                    SoundSynthesizer.playTick()
                                 }
                             },
                         contentAlignment = Alignment.Center
@@ -177,29 +216,24 @@ fun UrgeSurferScreen(
                                 Text(
                                     text = breathPhase.uppercase(),
                                     color = orbColor,
-                                    fontSize = 16.sp,
+                                    fontSize = 14.sp,
                                     fontWeight = FontWeight.Black,
-                                    letterSpacing = 2.sp
+                                    letterSpacing = 3.sp
                                 )
                                 Text(
-                                    text = "s",
+                                    text = "${secondsRemaining}s",
                                     color = MaterialTheme.colorScheme.onSurface,
-                                    fontSize = 56.sp,
+                                    fontSize = 52.sp,
                                     fontWeight = FontWeight.Black
                                 )
                                 Text(
-                                    text = "👆 Tap to anchor ()",
+                                    text = "\uD83D\uDC46 Tap to anchor ($tapsCount)",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Medium
                                 )
                             } else {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_nav_urge),
-                                    contentDescription = null,
-                                    tint = TealPrimary,
-                                    modifier = Modifier.size(48.dp)
-                                )
+                                Text("\uD83C\uDF0A", fontSize = 40.sp)
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text("Ready to Surf", color = MaterialTheme.colorScheme.onSurface, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                                 Text("Tap Start Below", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
@@ -207,18 +241,21 @@ fun UrgeSurferScreen(
                         }
                     }
 
-                    // Progress Bar at Bottom
+                    // Progress bar
                     LinearProgressIndicator(
-                        progress = ((90f - secondsRemaining) / 90f).coerceIn(0f, 1f),
+                        progress = { ((90f - secondsRemaining) / 90f).coerceIn(0f, 1f) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(8.dp)
-                            .align(Alignment.BottomCenter),
+                            .height(6.dp)
+                            .padding(horizontal = 16.dp)
+                            .align(Alignment.BottomCenter)
+                            .offset(y = (-12).dp),
                         color = orbColor,
-                        trackColor = Color.Transparent
+                        trackColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                        strokeCap = StrokeCap.Round
                     )
                 } else {
-                    // Completed Celebration
+                    // VICTORY SCREEN
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -228,38 +265,42 @@ fun UrgeSurferScreen(
                             modifier = Modifier
                                 .size(80.dp)
                                 .clip(CircleShape)
-                                .background(EmeraldAccent.copy(alpha=0.2f))
-                                .border(2.dp, EmeraldAccent, CircleShape),
+                                .background(
+                                    Brush.radialGradient(
+                                        listOf(EmeraldAccent.copy(alpha = 0.3f), EmeraldAccent.copy(alpha = 0.05f))
+                                    )
+                                )
+                                .border(3.dp, EmeraldAccent, CircleShape),
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_nav_interceptor),
-                                contentDescription = null,
-                                tint = EmeraldAccent,
-                                modifier = Modifier.size(40.dp)
-                            )
+                            Text("\uD83C\uDFC6", fontSize = 36.sp)
                         }
-                        
+
                         Text(
-                            text = "Craving Peak Collapsed!",
+                            text = "Craving Collapsed!",
                             color = MaterialTheme.colorScheme.onSurface,
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Black
                         )
                         Text(
-                            text = "You rode the neurochemical surge without reacting. Your receptors just recalibrated.",
+                            text = "You anchored $tapsCount times and rode the full 90s wave. Your dopamine receptors just recalibrated.",
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 16.sp,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                            lineHeight = 24.sp
+                            fontSize = 15.sp,
+                            textAlign = TextAlign.Center,
+                            lineHeight = 22.sp
                         )
                         Button(
-                            onClick = onNavigateToReplacements,
-                            modifier = Modifier.fillMaxWidth().height(56.dp),
+                            onClick = {
+                                SoundSynthesizer.playWhoosh()
+                                onNavigateToReplacements()
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
                             shape = RoundedCornerShape(16.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = EmeraldAccent)
                         ) {
-                            Text("Explore 30s Dopamine Bites", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                            Text("\u2728 Explore Dopamine Bites", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                         }
                     }
                 }
@@ -285,13 +326,20 @@ fun UrgeSurferScreen(
                             HapticFeedback.triggerClick(context)
                         }
                     },
-                    modifier = Modifier.weight(1f).height(64.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(64.dp),
                     shape = RoundedCornerShape(20.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = TealPrimary)
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isRunning) IndigoAccent else TealPrimary
+                    )
                 ) {
-                    Icon(painter = painterResource(R.drawable.ic_nav_urge), contentDescription = null, tint = Color.White, modifier = Modifier.size(24.dp))
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text(if (isRunning) "Pause Wave" else "Start 90s Surfer", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.White)
+                    Text(
+                        if (isRunning) "\u23F8 Pause Wave" else "\uD83C\uDF0A Start 90s Surfer",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 17.sp,
+                        color = Color.White
+                    )
                 }
 
                 if (isRunning) {
@@ -300,10 +348,34 @@ fun UrgeSurferScreen(
                             isRunning = false
                             secondsRemaining = 90
                             HapticFeedback.triggerClick(context)
+                            SoundSynthesizer.playWarning()
                         },
-                        modifier = Modifier.size(64.dp).background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(20.dp))
+                        modifier = Modifier
+                            .size(64.dp)
+                            .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(20.dp))
                     ) {
-                        Icon(painter = painterResource(R.drawable.ic_nav_focus), contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(28.dp))
+                        Text("\u23F9", fontSize = 24.sp)
+                    }
+                }
+            }
+
+            // Stats while running
+            if (isRunning) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("$phaseSeconds", color = orbColor, fontSize = 20.sp, fontWeight = FontWeight.Black)
+                        Text("PHASE", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                    }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("$tapsCount", color = AmberAccent, fontSize = 20.sp, fontWeight = FontWeight.Black)
+                        Text("TAPS", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                    }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("${90 - secondsRemaining}s", color = EmeraldAccent, fontSize = 20.sp, fontWeight = FontWeight.Black)
+                        Text("ELAPSED", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 9.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }
