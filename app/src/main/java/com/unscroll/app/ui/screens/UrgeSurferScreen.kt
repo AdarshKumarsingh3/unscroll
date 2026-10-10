@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -243,7 +244,7 @@ fun UrgeSurferScreen(
 
                     // Progress bar
                     LinearProgressIndicator(
-                        progress = { ((90f - secondsRemaining) / 90f).coerceIn(0f, 1f) },
+                        progress = ((90f - secondsRemaining) / 90f).coerceIn(0f, 1f),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(6.dp)

@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -480,7 +481,7 @@ private fun SquatsModal(onDismiss: () -> Unit, onComplete: () -> Unit) {
                 )
 
                 LinearProgressIndicator(
-                    progress = { progress.coerceIn(0f, 1f) },
+                    progress = progress.coerceIn(0f, 1f),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(8.dp)

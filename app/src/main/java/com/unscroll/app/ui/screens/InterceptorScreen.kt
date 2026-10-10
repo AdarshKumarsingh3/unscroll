@@ -260,7 +260,7 @@ fun InterceptorScreen(
                         )
                     }
                     if (index < monitoredApps.size - 1) {
-                        HorizontalDivider(
+                        Divider(
                             color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
                             modifier = Modifier.padding(horizontal = 8.dp)
                         )

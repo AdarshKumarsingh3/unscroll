@@ -223,7 +223,7 @@ fun CalculatorScreen(
                     }
                 }
 
-                HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+                Divider(color = MaterialTheme.colorScheme.outline)
 
                 // Opportunity cost section
                 Text(

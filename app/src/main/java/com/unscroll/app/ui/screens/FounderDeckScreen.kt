@@ -123,9 +123,9 @@ fun FounderDeckScreen(
                         Text("\uD83C\uDFDB\uFE0F THE 3 PILLARS", color = TealBright, fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
 
                         PillarItem(number = "1", title = "Intercept", desc = "Accessibility service blocks unconscious app opens.", color = CyanAccent)
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+                        Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
                         PillarItem(number = "2", title = "Recalibrate", desc = "90-second Urge Surfer drops dopamine baseline.", color = IndigoAccent)
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
+                        Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
                         PillarItem(number = "3", title = "Replace", desc = "30-second micro-activities satisfy the craving.", color = EmeraldAccent)
                     }
                 }
