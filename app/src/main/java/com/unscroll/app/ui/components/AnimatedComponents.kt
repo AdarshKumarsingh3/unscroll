@@ -7,13 +7,15 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import com.unscroll.app.service.SoundSynthesizer
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun AnimatedPressCard(
@@ -67,9 +69,9 @@ fun AnimatedEntryCard(
     val enterAlpha = remember { Animatable(0f) }
     val enterOffset = remember { Animatable(30f) }
 
-    androidx.compose.runtime.LaunchedEffect(Unit) {
-        kotlinx.coroutines.delay(index * 80L)
-        kotlinx.coroutines.launch {
+    LaunchedEffect(Unit) {
+        delay(index * 80L)
+        launch {
             enterAlpha.animateTo(1f, tween(400, easing = FastOutSlowInEasing))
         }
         enterOffset.animateTo(0f, tween(400, easing = FastOutSlowInEasing))
@@ -82,28 +84,5 @@ fun AnimatedEntryCard(
                 translationY = enterOffset.value
             },
         content = content
-    )
-}
-
-/** Shimmer loading placeholder effect */
-@Composable
-fun ShimmerBox(
-    modifier: Modifier = Modifier
-) {
-    val shimmer = rememberInfiniteTransition(label = "shimmer")
-    val shimmerAlpha by shimmer.animateFloat(
-        initialValue = 0.2f,
-        targetValue = 0.5f,
-        animationSpec = infiniteRepeatable(
-            tween(800, easing = LinearEasing),
-            RepeatMode.Reverse
-        ),
-        label = "shimmerAlpha"
-    )
-
-    Box(
-        modifier = modifier
-            .graphicsLayer { alpha = shimmerAlpha }
-            .then(modifier)
     )
 }

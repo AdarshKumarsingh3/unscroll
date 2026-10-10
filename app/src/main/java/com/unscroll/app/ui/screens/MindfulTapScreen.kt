@@ -28,7 +28,7 @@ import com.unscroll.app.service.SoundSynthesizer
 import com.unscroll.app.ui.components.HapticFeedback
 import com.unscroll.app.ui.theme.*
 import kotlinx.coroutines.delay
-import kotlin.math.sin
+import kotlinx.coroutines.launch
 
 data class ZenOrb(
     val id: Int,
@@ -398,7 +398,7 @@ private fun TappableOrb(orb: ZenOrb, onTap: () -> Unit) {
     val enterAlpha = remember { Animatable(0f) }
 
     LaunchedEffect(orb.id) {
-        kotlinx.coroutines.launch {
+        launch {
             enterScale.animateTo(1f, spring(dampingRatio = 0.5f, stiffness = 300f))
         }
         enterAlpha.animateTo(1f, tween(200))
