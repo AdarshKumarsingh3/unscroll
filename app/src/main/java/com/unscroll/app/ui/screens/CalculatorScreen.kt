@@ -52,7 +52,7 @@ fun CalculatorScreen(
     val languageLessons = (yearlyHours / 0.5f).toInt()
 
     // Danger level animation
-    val dangerLevel = ((dailyHours - 0.5f) / 7.5f).coerceIn(0f, 1f)
+    val dangerLevel = ((dailyHours - 0.5f) / 19.5f).coerceIn(0f, 1f)
     val pulseAnim = rememberInfiniteTransition(label = "pulse")
     val pulseAlpha by pulseAnim.animateFloat(
         initialValue = 0.3f,
@@ -60,6 +60,28 @@ fun CalculatorScreen(
         animationSpec = infiniteRepeatable(tween(1200), RepeatMode.Reverse),
         label = "pulseAlpha"
     )
+
+    // Humorous roast message based on hours
+    val roastMessage = when {
+        dailyHours >= 18f -> "\uD83E\uDD16 Are you even human? This is literally a full-time job PLUS overtime. Your phone should be paying YOU rent."
+        dailyHours >= 15f -> "\uD83D\uDC7D You scroll more than you breathe. Scientists would like to study you. Aliens are impressed."
+        dailyHours >= 12f -> "\uD83D\uDE31 You're awake 16 hours and scrolling 12+ of them? Your thumbs deserve a workers' union."
+        dailyHours >= 10f -> "\u2620\uFE0F 10 hours?! That's not screen time, that's a SCREEN RELATIONSHIP. Your phone is your significant other."
+        dailyHours >= 8f -> "\uD83E\uDD2F At this point, YOU are the content. The algorithm has consumed you whole."
+        dailyHours >= 6f -> "\uD83D\uDD25 6+ hours is a part-time job of doing nothing productive. Your future self is filing a lawsuit."
+        dailyHours >= 4f -> "\uD83D\uDE2C 4 hours daily. That's 60 full days a year. You could learn guitar, speak French, AND read 100 books."
+        dailyHours >= 2f -> "\uD83D\uDE10 Not great, not terrible. But 2 hours is still 30 full days a year. That's a month of your life."
+        dailyHours >= 1f -> "\uD83D\uDCAA Under 2 hours? You're ahead of 80% of people. Keep pushing."
+        else -> "\uD83C\uDF1F Under an hour? You're basically a monk. Teach us your ways."
+    }
+
+    val roastColor = when {
+        dailyHours >= 12f -> RoseDanger
+        dailyHours >= 8f -> OrangeAccent
+        dailyHours >= 4f -> AmberAccent
+        dailyHours >= 2f -> BlueCalm
+        else -> EmeraldAccent
+    }
 
     Column(
         modifier = Modifier
@@ -126,7 +148,13 @@ fun CalculatorScreen(
                     // Big animated number
                     Text(
                         text = String.format(Locale.US, "%.1f hrs", dailyHours),
-                        color = if (dailyHours > 4f) RoseDanger else if (dailyHours > 2f) AmberAccent else EmeraldAccent,
+                        color = when {
+                            dailyHours >= 12f -> RoseDanger
+                            dailyHours > 8f -> OrangeAccent
+                            dailyHours > 4f -> AmberAccent
+                            dailyHours > 2f -> BlueCalm
+                            else -> EmeraldAccent
+                        },
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Black
                     )
@@ -139,14 +167,55 @@ fun CalculatorScreen(
                         prefs.dailyScreenTimeSetting = it
                         HapticFeedback.triggerClick(context)
                     },
-                    valueRange = 0.5f..8.0f,
-                    steps = 14,
+                    valueRange = 0.5f..20.0f,
+                    steps = 38,
                     colors = SliderDefaults.colors(
-                        thumbColor = if (dailyHours > 4f) RoseDanger else if (dailyHours > 2f) AmberAccent else TealBright,
-                        activeTrackColor = if (dailyHours > 4f) RoseDanger else if (dailyHours > 2f) AmberAccent else TealBright,
+                        thumbColor = when {
+                            dailyHours >= 12f -> RoseDanger
+                            dailyHours > 8f -> OrangeAccent
+                            dailyHours > 4f -> AmberAccent
+                            dailyHours > 2f -> BlueCalm
+                            else -> TealBright
+                        },
+                        activeTrackColor = when {
+                            dailyHours >= 12f -> RoseDanger
+                            dailyHours > 8f -> OrangeAccent
+                            dailyHours > 4f -> AmberAccent
+                            dailyHours > 2f -> BlueCalm
+                            else -> TealBright
+                        },
                         inactiveTrackColor = MaterialTheme.colorScheme.outline
                     )
                 )
+
+                // Labels row
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("0.5h", color = EmeraldAccent, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    Text("8h", color = AmberAccent, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    Text("14h", color = OrangeAccent, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                    Text("20h", color = RoseDanger, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                }
+
+                // ROAST MESSAGE
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(roastColor.copy(alpha = 0.08f))
+                        .border(1.dp, roastColor.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
+                        .padding(16.dp)
+                ) {
+                    Text(
+                        text = roastMessage,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontSize = 14.sp,
+                        lineHeight = 20.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
 
                 // IMPACT METRICS - 2x2 grid
                 Row(

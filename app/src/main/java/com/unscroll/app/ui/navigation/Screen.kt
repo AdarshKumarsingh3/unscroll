@@ -12,6 +12,11 @@ sealed class Screen(val route: String, val title: String, @DrawableRes val iconR
     object Dashboard : Screen("dashboard", "Saved", R.drawable.ic_nav_dashboard)
     object FounderDeck : Screen("founder_deck", "Pitch", R.drawable.ic_nav_pitch)
     object MindfulTap : Screen("mindful_tap", "Zen Tap", R.drawable.ic_nav_focus)
+    object BreathFlow : Screen("breath_flow", "Breathe", R.drawable.ic_nav_focus)
+    object ColorMatch : Screen("color_match", "Colors", R.drawable.ic_nav_focus)
+    object ZenGarden : Screen("zen_garden", "Garden", R.drawable.ic_nav_focus)
+    object WordScramble : Screen("word_scramble", "Words", R.drawable.ic_nav_focus)
+    object StreakChallenge : Screen("streak_challenge", "Streak", R.drawable.ic_nav_focus)
 
     companion object {
         val bottomNavItems get() = listOf(

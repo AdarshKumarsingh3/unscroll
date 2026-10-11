@@ -61,7 +61,7 @@ class MainActivity : ComponentActivity() {
                             isDarkTheme = !isDarkTheme 
                             prefs.isDarkModeEnabled = isDarkTheme
                             HapticFeedback.triggerClick(context)
-                            SoundSynthesizer.playTick()
+                            SoundSynthesizer.playWaterDrop()
                         }
                     )
                 }
@@ -81,7 +81,12 @@ fun UnscrollApp(isDarkTheme: Boolean, onThemeToggle: () -> Unit) {
         Screen.UrgeSurfer.route,
         Screen.FocusRooms.route,
         Screen.FounderDeck.route,
-        Screen.MindfulTap.route
+        Screen.MindfulTap.route,
+        Screen.BreathFlow.route,
+        Screen.ColorMatch.route,
+        Screen.ZenGarden.route,
+        Screen.WordScramble.route,
+        Screen.StreakChallenge.route
     )
     val showBottomBar = currentDestination?.route !in hideBottomBarRoutes
 
@@ -133,6 +138,7 @@ fun UnscrollApp(isDarkTheme: Boolean, onThemeToggle: () -> Unit) {
                     IconButton(
                         onClick = {
                             HapticFeedback.triggerClick(context)
+                            SoundSynthesizer.playWindChime()
                             navController.navigate(Screen.FocusRooms.route)
                         },
                         modifier = Modifier.size(40.dp)
@@ -143,6 +149,7 @@ fun UnscrollApp(isDarkTheme: Boolean, onThemeToggle: () -> Unit) {
                     IconButton(
                         onClick = {
                             HapticFeedback.triggerClick(context)
+                            SoundSynthesizer.playWhoosh()
                             navController.navigate(Screen.FounderDeck.route)
                         },
                         modifier = Modifier.size(40.dp)
@@ -216,7 +223,14 @@ fun UnscrollApp(isDarkTheme: Boolean, onThemeToggle: () -> Unit) {
                 slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right, tween(280)) + fadeOut(tween(200))
             }
         ) {
-            composable(Screen.Dashboard.route) { DashboardScreen() }
+            composable(Screen.Dashboard.route) {
+                DashboardScreen(
+                    onNavigateToGame = { route ->
+                        SoundSynthesizer.playWhoosh()
+                        navController.navigate(route)
+                    }
+                )
+            }
             composable(Screen.Calculator.route) { 
                 CalculatorScreen(
                     onNavigateToUrgeSurfer = { navController.navigate(Screen.UrgeSurfer.route) },
@@ -246,6 +260,21 @@ fun UnscrollApp(isDarkTheme: Boolean, onThemeToggle: () -> Unit) {
             }
             composable(Screen.MindfulTap.route) {
                 MindfulTapScreen(onNavigateBack = { navController.popBackStack() })
+            }
+            composable(Screen.BreathFlow.route) {
+                BreathFlowScreen(onNavigateBack = { navController.popBackStack() })
+            }
+            composable(Screen.ColorMatch.route) {
+                ColorMatchScreen(onNavigateBack = { navController.popBackStack() })
+            }
+            composable(Screen.ZenGarden.route) {
+                ZenGardenScreen(onNavigateBack = { navController.popBackStack() })
+            }
+            composable(Screen.WordScramble.route) {
+                WordScrambleScreen(onNavigateBack = { navController.popBackStack() })
+            }
+            composable(Screen.StreakChallenge.route) {
+                StreakChallengeScreen(onNavigateBack = { navController.popBackStack() })
             }
         }
     }

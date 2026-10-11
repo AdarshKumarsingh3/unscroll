@@ -3,6 +3,7 @@ package com.unscroll.app.ui.screens
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -16,6 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -32,7 +34,9 @@ import com.unscroll.app.ui.theme.*
 import java.util.Locale
 
 @Composable
-fun DashboardScreen() {
+fun DashboardScreen(
+    onNavigateToGame: ((String) -> Unit)? = null
+) {
     val context = LocalContext.current
     val prefs = remember { UnscrollPreferences(context) }
     
@@ -247,6 +251,97 @@ fun DashboardScreen() {
             }
         }
 
+        // GAMES & TOOLS GRID
+        if (onNavigateToGame != null) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+            ) {
+                Column(
+                    modifier = Modifier.padding(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        text = "\uD83C\uDFAE GAMES & MINDFUL TOOLS",
+                        color = PurpleAccent,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.sp
+                    )
+
+                    Text(
+                        text = "Replace scrolling with these focus-building activities",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 13.sp
+                    )
+
+                    // Row 1
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        GameTile(
+                            emoji = "\uD83C\uDFAE",
+                            title = "Zen Tap",
+                            subtitle = "Mindful tapping",
+                            color = PurpleAccent,
+                            onClick = { onNavigateToGame("mindful_tap") },
+                            modifier = Modifier.weight(1f)
+                        )
+                        GameTile(
+                            emoji = "\uD83C\uDF2C\uFE0F",
+                            title = "Breathe",
+                            subtitle = "4-7-8 technique",
+                            color = CyanAccent,
+                            onClick = { onNavigateToGame("breath_flow") },
+                            modifier = Modifier.weight(1f)
+                        )
+                        GameTile(
+                            emoji = "\uD83C\uDFA8",
+                            title = "Colors",
+                            subtitle = "Focus test",
+                            color = OrangeAccent,
+                            onClick = { onNavigateToGame("color_match") },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+
+                    // Row 2
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        GameTile(
+                            emoji = "\uD83C\uDF3F",
+                            title = "Garden",
+                            subtitle = "Grow zen",
+                            color = EmeraldAccent,
+                            onClick = { onNavigateToGame("zen_garden") },
+                            modifier = Modifier.weight(1f)
+                        )
+                        GameTile(
+                            emoji = "\uD83D\uDD24",
+                            title = "Words",
+                            subtitle = "Brain tease",
+                            color = IndigoAccent,
+                            onClick = { onNavigateToGame("word_scramble") },
+                            modifier = Modifier.weight(1f)
+                        )
+                        GameTile(
+                            emoji = "\uD83D\uDD25",
+                            title = "Streak",
+                            subtitle = "Daily dare",
+                            color = AmberAccent,
+                            onClick = { onNavigateToGame("streak_challenge") },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+            }
+        }
+
         // REWIRING ROADMAP
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -275,6 +370,33 @@ fun DashboardScreen() {
         }
 
         Spacer(modifier = Modifier.height(20.dp))
+    }
+}
+
+@Composable
+private fun GameTile(
+    emoji: String,
+    title: String,
+    subtitle: String,
+    color: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(color.copy(alpha = 0.08f))
+            .border(1.dp, color.copy(alpha = 0.25f), RoundedCornerShape(16.dp))
+            .clickable { onClick() }
+            .padding(12.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(emoji, fontSize = 24.sp)
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(title, color = MaterialTheme.colorScheme.onSurface, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            Text(subtitle, color = color, fontSize = 9.sp, fontWeight = FontWeight.Medium)
+        }
     }
 }
 
